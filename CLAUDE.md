@@ -13,6 +13,7 @@
 | 무엇을 만들고 안 만드나? 외부 데이터(장소 검색) 조건은? 사전 검증에서 본 경우는? | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) |
 | 화면 · 색 · 서체 · 움직임은? | [docs/DESIGN.md](docs/DESIGN.md) · 그림은 [docs/mockups/](docs/mockups/README.md) |
 | 왜 이렇게 정했어? | [docs/decisions/](docs/decisions/README.md) |
+| 끝난 단계에서 무슨 일이 있었어? | [docs/archive/](docs/archive/README.md) (단계별 DEVLOG) |
 | 스택 칸별 버전 · 근거 · CI/CD · 개발 첫날 확인할 것은? | [docs/research/final-choice-elixir.md](docs/research/final-choice-elixir.md) (2026-11-22 조사 기록, 고치지 않음) |
 
 ## 문서 규칙
