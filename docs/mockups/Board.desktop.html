@@ -92,6 +92,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .cards { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .card { position: relative; background: var(--card); border-radius: 14px; padding: 12px 12px 12px 14px;
   border-left: 6px solid var(--tod); box-shadow: 0 1px 3px rgba(0,0,0,.06); display: grid; grid-template-columns: 62px 1fr; gap: 8px; }
+.card.tod-x { --tod: var(--line-soft); border-left-style: dashed; }
+.card.tod-x time { color: var(--muted); }
+.undated { font-size: 12px; color: var(--muted); padding: 6px 4px 0; display: flex; align-items: center; gap: 8px; }
+.undated::after { content: ""; flex: 1; border-top: 1px dashed var(--line-soft); }
 .card.tod-m { --tod: var(--tod-m); } .card.tod-d { --tod: var(--tod-d); } .card.tod-e { --tod: var(--tod-e); } .card.tod-n { --tod: var(--tod-n); }
 .card time { font-weight: 700; font-variant-numeric: tabular-nums; align-self: start; }
 .card time i { display: block; font-style: normal; font-size: 15px; margin-top: 2px; }
@@ -156,8 +160,17 @@ const STOPS = {
   s7: { t: "15:30", name: "호숫가 카페", memo: "", tags: ["카페"] },
   s8: { t: "10:00", name: "신사 산책", memo: "오전에 덜 붐빔", tags: ["구경"] },
   s9: { t: "13:00", name: "공항", memo: "출발 15:20", tags: ["이동"] },
+  s10: { t: "", name: "기념품 가게", memo: "시간 나면", tags: ["구경"] },
 };
-const order = [["s1", "s2", "s3", "s4"], ["s5", "s6", "s7"], ["s8", "s9"]];
+/* 날짜마다 어떤 카드가 있는지만 갖고, 하루 안 순서는 시각이 정한다(decisions/0004).
+   시각 없는 카드는 맨 아래 "시간 미정", 같은 시각이면 넣은 순서 */
+const days = [["s1", "s2", "s3", "s4"], ["s5", "s6", "s7"], ["s8", "s9", "s10"]];
+const byTime = (ids) => ids.map((id, i) => [id, i]).sort(([a, i], [b, j]) => {
+  const ta = STOPS[a].t, tb = STOPS[b].t;
+  if (!ta !== !tb) return ta ? -1 : 1;
+  return ta === tb ? i - j : ta < tb ? -1 : 1;
+}).map(([id]) => id);
+const order = days.map(byTime);
 const MEMBERS = [ { n: "나", on: true, day: 0 }, { n: "서", on: true, day: 1 }, { n: "도", on: true, day: 0 } ];
 const FEED = [
   { who: "도", what: "<b>캐널시티</b> 메모를 고치는 중", when: "방금" },
@@ -168,8 +181,8 @@ const q = new URLSearchParams(location.search);
 if (q.get("dark") === "1") document.documentElement.dataset.dark = "";
 const showEdit = q.get("edit") !== "0";
 let moved = null, demoDone = false;
-const tod = (t) => { const h = +t.slice(0, 2); return h < 11 ? "m" : h < 16 ? "d" : h < 19 ? "e" : "n"; };
-const TOD_ICON = { m: "🌅", d: "☀️", e: "🌇", n: "🌙" };
+const tod = (t) => { if (!t) return "x"; const h = +t.slice(0, 2); return h < 11 ? "m" : h < 16 ? "d" : h < 19 ? "e" : "n"; };
+const TOD_ICON = { m: "🌅", d: "☀️", e: "🌇", n: "🌙", x: "" };
 
 /* 풍경: Directions.html과 같은 그림. 풍경 층은 두 벌을 이어 붙여 옆으로 흐르게 한다 */
 function sceneSvg(scene, uid) {
@@ -216,9 +229,10 @@ function draw() {
         ${DAYS.map((d, i) => `<div class="col" style="--line:${d.line}">
           <div class="col-head"><h2>${d.label}</h2><small>${d.sub}</small><span class="cnt">${order[i].length}곳</span></div>
           <div class="mini ${order[i].length === 1 ? "one" : ""}">${miniRoute(order[i])}</div>
-          <ol class="cards">${order[i].map(id => { const s = STOPS[id]; const k = tod(s.t); return `
+          <ol class="cards">${order[i].map((id, j, arr) => { const s = STOPS[id]; const k = tod(s.t);
+            const head = !s.t && (j === 0 || STOPS[arr[j - 1]].t) ? `<li class="undated">시간 미정</li>` : ""; return `${head}
             <li class="card tod-${k} ${moved === id ? "moved" : ""}" style="view-transition-name:c-${id}">
-              <time>${s.t}<i>${TOD_ICON[k]}</i></time>
+              <time>${s.t || "—"}<i>${TOD_ICON[k]}</i></time>
               <div><div class="name">${s.name}</div>${s.memo ? `<p class="memo">${s.memo}</p>` : ""}
                 <div class="tags">${s.tags.map(t => `<span>${t}</span>`).join("")}</div></div>
               ${showEdit && s.editing ? `<span class="editing">${s.editing} 편집 중</span>` : ""}
@@ -244,12 +258,12 @@ function draw() {
     </aside>
   </div>`;
   document.getElementById("demo").onclick = () => go(() => {
-    if (!demoDone) {
-      order[1].splice(order[1].indexOf("s7"), 1); order[0].push("s7"); moved = "s7";
-      FEED.unshift({ who: "서", what: "<b>호숫가 카페</b>를 1일차로 옮겼어요", when: "방금" });
-    } else {
-      order[0].splice(order[0].indexOf("s7"), 1); order[1].push("s7"); moved = "s7"; FEED.shift();
-    }
+    /* 다른 날로 옮기면 시각은 그대로, 그 날의 시간순 자리로 들어간다(0004) */
+    const [from, to] = demoDone ? [0, 1] : [1, 0];
+    days[from].splice(days[from].indexOf("s7"), 1); days[to].push("s7"); moved = "s7";
+    order.splice(0, order.length, ...days.map(byTime));
+    if (!demoDone) FEED.unshift({ who: "서", what: "<b>호숫가 카페</b>를 1일차로 옮겼어요", when: "방금" });
+    else FEED.shift();
     demoDone = !demoDone;
   });
 }
