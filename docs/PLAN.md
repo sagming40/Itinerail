@@ -65,7 +65,10 @@
 
 ### M1 · 뼈대 + 첫 배포
 - [x] 첫 작업: 가입 · 로그인 화면 목업(`mockups/Auth.html`) · 상태 · 문구를 DESIGN 7.1에 *(M0 점검에서 미룸)* (2026-11-22)
-- [ ] Elixir 설치(사용자) · `mix phx.new` · `phx.gen.auth --hashing-lib argon2` · daisyUI 테마 · `mix ci` 별칭 · Taskfile · CI · release 이미지 · 배포
+- [x] Elixir 1.20.5 · Hex · phx_new 1.8.17 설치(사용자, 2026-11-22)
+- [x] `mix phx.new . --app itinerail --binary-id`(사용자, 커밋 `eb44fce`, 2026-11-22)
+- [ ] 개발 DB(Docker Postgres 18, 포트 5440) · 첫 `mix phx.server`
+- [ ] `phx.gen.auth --hashing-lib argon2` · daisyUI 테마(DESIGN 3 ~ 6장) · `mix ci` 별칭 · Taskfile · CI · release 이미지 · 배포
 - **완료 기준**: `mix ci` 통과, CI 초록, **휴대폰(LTE)으로 하위 주소에서 가입 → 매직 링크 로그인**
 
 ### M2 · 혼자 짜기

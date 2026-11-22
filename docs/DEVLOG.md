@@ -7,11 +7,27 @@
 | 항목 | 내용 |
 |---|---|
 | 단계 | M1 · 뼈대 + 첫 배포 |
-| 진행 중 | 개발 첫날 — Elixir 1.20.5 · Hex · phx_new 1.8.17 설치 끝 |
-| 다음에 할 일 | `mix phx.new . --app itinerail --binary-id`(사용자) → 개발 DB(Docker, 포트 비켜서) → `phx.gen.auth --hashing-lib argon2` |
+| 진행 중 | 뼈대 생성까지(`mix phx.new`, 커밋 `eb44fce`). 개발 DB는 아직 — 서버를 한 번도 안 띄웠다 |
+| 다음에 할 일 | `compose.yaml`(Postgres 18, 포트 **5440**) · `config/dev.exs` · `test.exs`에 `port: 5440` 타이핑(사용자) → `docker compose up -d` → `mix ecto.create` → `mix phx.server` → 코드 검수 → Taskfile → `phx.gen.auth --hashing-lib argon2` |
 | 기기별로 할 일 | 노트북만 씀. 다른 기기는 `git clone https://github.com/sagming40/Itinerail` |
 
 ---
+
+## 2026-11-22 (8) · 뼈대 생성 (노트북)
+
+### 한 일
+- 사용자가 `mix phx.new . --app itinerail --binary-id`를 쳤다(의존성 받기 Y, `README.md` · `.gitignore` 덮어쓰기 n). 확인한 것: `mix.exs` `app: :itinerail`, `config/config.exs` `generators: [timestamp_type: :utc_datetime, binary_id: true]`, `README.md` · `.gitignore` 변경 없음(`git diff` 비어 있음), `AGENTS.md` 448줄(Phoenix 1.8 관례 안내 — 기본대로 둠), `deps/` 44개, `_build/`에 Tailwind 4.3.3 · esbuild 실행 파일, `deps/` · `_build/`는 `.gitignore`가 막음. 앱 코드는 아직 컴파일 안 됨(`_build/dev/lib/itinerail` 없음).
+- 손대지 않은 생성기 결과 그대로 따로 커밋했다 — 뒤에 우리가 고친 것과 구분하려고.
+- 개발 DB 계획: 이 노트북은 5432에 Postgres 18 서비스, 다른 프로젝트가 5433 · 5434 · 5435 · 5436 · 5438 · 5439를 쓴다(`C:\_dev\*` compose 파일 검색) → **5440**. `compose.yaml`(pc-buildcheck 모양, IPv4 · IPv6 둘 다 열기, 볼륨 `/var/lib/postgresql`, healthcheck)과 `dev.exs` · `test.exs`에 `port: 5440`을 보여 줬다 — 사용자가 다음에 친다. DB 비밀번호는 생성기가 `config/dev.exs`에 커밋하는 `postgres`/`postgres`를 그대로 써서 `.env`로 빼지 않는다(같은 값을 두 곳에 두지 않게, `127.0.0.1`에서만 열림).
+
+### 막힌 것
+- 마지막에 친 `mix phx.new`(인자 없음)가 도움말만 띄움 — 생성은 그 전 명령으로 이미 끝나 있었다. 걱정할 것 없음.
+
+### 이번 세션 커밋 (2026-11-22, (1) ~ (8) 전체)
+- `6f369c9` init: 문서 세트와 저장소 설정으로 시작 → `540ac14` 저장소 상태 맞춤 → `b163d9d` · `738d7d1` 방향 시안 → `43e47d6` E 채택 · PC 일정 판 → `62bee8e` 순서 시간순 → `66cab30` 디자인 확정 값 → `6c8638b` 하위 주소 → `8b48166` M0 점검 → `c1d9f8b` M0 닫음 → `a6599ec` · `1136684` 가입 · 로그인 화면 → `8f26e48` Elixir 설치 기록 → `eb44fce` init: mix phx.new 뼈대
+
+### 다음에 할 일
+- "현재 상태" 다음에 할 일.
 
 ## 2026-11-22 (7) · 개발 첫날 — Elixir 설치 (노트북)
 
