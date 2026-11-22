@@ -57,7 +57,9 @@ minor-stacks에서 이어 온다. **버전 · 활동 · 지원 여부 · 외부 
 
 - **시작할 때**: [docs/DEVLOG.md](docs/DEVLOG.md) "현재 상태"를 먼저 읽는다. 저장소가 생긴 뒤에는 `git status` · `git pull --ff-only`.
 - **끝날 때**: DEVLOG 맨 위에 날짜 블록을 더하고 "현재 상태"와 PLAN 진행 표를 맞춘다(`devlog` 스킬). 커밋 · push.
-- **아직 git 저장소가 아니다.** `git init` · 첫 커밋 · GitHub 저장소는 사용자가 직접 한다(2026-11-22). 그 뒤 커밋 · push는 전역 규칙대로.
+- 저장소: GitHub 공개 `sagming40/Itinerail`, 브랜치 `main`(2026-11-22 사용자가 `git init` · 원격 연결). 커밋 · push는 Claude가 한다.
+- 커밋 메시지는 **Summary + Description**: 첫 줄은 접두사(`init` · `chore` · `feat` · `fix` · `refactor` · `docs` 등) + 한 줄 요약, 한 줄 띄우고 무엇을 · 왜 바꿨는지 목록으로.
+- 공개 저장소라 비밀값 · 서버 IP · 개인 정보는 문서 · 커밋에 넣지 않는다.
 
 ## 기기
 

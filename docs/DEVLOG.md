@@ -7,9 +7,9 @@
 | 항목 | 내용 |
 |---|---|
 | 단계 | M0 · 정하기 |
-| 진행 중 | `docs/` 세트를 세웠다. 아직 git 저장소가 아니다 |
-| 다음에 할 일 | `git init` · 첫 커밋 · GitHub 저장소(사용자) → 하위 주소 → 디자인 방향 한 문장 → 목업 시안 비교 → DESIGN |
-| 기기별로 할 일 | 노트북만 씀. 다른 기기는 GitHub에 올린 뒤 `git clone` |
+| 진행 중 | `docs/` 세트 · 저장소 설정 · GitHub 공개 저장소 연결까지 했다 |
+| 다음에 할 일 | 하위 주소 → 디자인 방향 한 문장 → 목업 시안 비교 → DESIGN |
+| 기기별로 할 일 | 노트북만 씀. 다른 기기는 `git clone https://github.com/sagming40/Itinerail` |
 
 ---
 
@@ -26,8 +26,12 @@
 - 프로젝트 `CLAUDE.md` · `README.md`를 만들었다.
 - minor-stacks 쪽 `plan_travel.md` · `final-choice-elixir.md`는 같은 내용이 두 곳에 남지 않게 지우고, 그쪽 문서에서 이 저장소를 가리키게 했다.
 
+- 사용자가 `.gitattributes` · `.editorconfig` · `.gitignore`를 쳤다(cbt-journal · PlayLedger 규칙 + Phoenix 1.8.17 생성기 `.gitignore` 템플릿). 검수: 줄바꿈 LF, `git check-ignore`로 `.env` · `.elixir_ls/` · `_build/`가 무시되는 것 확인.
+- 사용자가 `git init -b main` · GitHub 공개 저장소 `sagming40/Itinerail` · 원격 연결을 했다. 공개라서 push 전에 문서에서 IP · 메일 · 계정 번호 · 키 모양 문자열을 찾아봤다 — 0건.
+
 ### 이번 세션 커밋
-- 없음 — git 저장소가 아니다. `git init` · 첫 커밋은 사용자가 한다.
+- `6f369c9` init: 문서 세트와 저장소 설정으로 시작 (16개 파일)
+- 이 블록 · PLAN · CLAUDE.md 저장소 상태 맞추기 (docs)
 
 ### 다음에 할 일
 - "현재 상태" 다음에 할 일.

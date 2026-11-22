@@ -55,7 +55,8 @@
 ### M0 · 정하기
 - [x] 프로젝트 이름 — Itinerail (2026-11-22)
 - [x] `docs/` 세트 · decisions 0001 ~ 0003 (2026-11-22)
-- [ ] `git init` · 첫 커밋 · GitHub 저장소(사용자)
+- [x] `git init` · GitHub 공개 저장소 `sagming40/Itinerail` · 원격 연결(사용자), 첫 커밋 `6f369c9` · push (2026-11-22)
+- [x] 저장소 설정 파일 `.gitattributes` · `.editorconfig` · `.gitignore` (사용자, 2026-11-22)
 - [ ] 하위 주소(`*.sagming.com`)
 - [ ] 디자인 방향 한 문장 → 목업 시안 비교 → [DESIGN.md](DESIGN.md) 확정 값
 - [x] 작업 방식 — 코드는 타이핑 학습 모드(프로젝트 CLAUDE.md, 2026-11-22)
