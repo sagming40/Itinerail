@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Itinerail 일정 판 PC</title>
+<!-- 목업이라 글꼴은 CDN. 실제 구현은 글꼴 파일을 직접 내려 준다 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+/* ============================================================
+   E · 기차 창가 — PC 일정 판
+   날짜를 칸으로 나란히 펼치고, 칸마다 그날 풍경이 흐르는 창문을 하나씩 둔다.
+   기차 옆면의 창문처럼 1일차 바다 → 2일차 산 → 3일차 도시가 이어진다.
+   ============================================================ */
+:root {
+  --bg: #f2f0eb; --fg: #23262d; --muted: #737884; --card: #ffffff; --chip: #e5e2da; --line-soft: #dcd8ce;
+  --train: #2f3a44; --train-2: #3a4652;
+  --av-bg: #2f3a44; --av-fg: #fff; --edit-bg: #2f3a44; --edit-fg: #fff;
+  --tod-m: #8fd0ff; --tod-d: #ffcf5c; --tod-e: #ff8a65; --tod-n: #4a5a92;
+  --font: "Pretendard", system-ui, sans-serif;
+  color-scheme: light;
+}
+:root[data-dark] {
+  --bg: #14171d; --fg: #eceef2; --muted: #9aa0ad; --card: #1e232b; --chip: #2a303a; --line-soft: #2c323c;
+  --train: #0b0d11; --train-2: #1a1f27;
+  --av-bg: #eceef2; --av-fg: #14171d; --edit-bg: #eceef2; --edit-fg: #14171d;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); min-width: 1100px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+
+/* ---------- 맨 위 막대 ---------- */
+.bar { display: flex; align-items: center; gap: 20px; padding: 14px 28px; }
+.brand { font-weight: 800; letter-spacing: -.02em; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+.brand i { width: 22px; height: 22px; border-radius: 7px; background: linear-gradient(#ff8a65, #ffd59e); display: inline-block; }
+.trip h1 { margin: 0; font-size: 20px; }
+.trip span { font-size: 13px; color: var(--muted); }
+.spacer { flex: 1; }
+.members { display: flex; align-items: center; gap: 10px; }
+.av { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700;
+  background: var(--av-bg); color: var(--av-fg); border: 2px solid var(--bg); position: relative; }
+.av.off { opacity: .4; }
+.av .dot { position: absolute; right: -2px; bottom: -2px; width: 11px; height: 11px; border-radius: 50%; background: #3ccf7a; border: 2px solid var(--bg); }
+.btn { border: 0; padding: 9px 14px; border-radius: 10px; background: var(--chip); font-weight: 600; font-size: 14px; }
+.btn.primary { background: var(--train); color: #fff; }
+:root[data-dark] .btn.primary { background: #eceef2; color: #14171d; }
+
+/* ---------- 본문: 여정(창문 + 날짜 칸) | 옆 패널 ---------- */
+.main { display: grid; grid-template-columns: 1fr 300px; gap: 24px; padding: 4px 28px 40px; align-items: start; }
+
+/* 기차 옆면: 어두운 띠 안에 창문이 날짜 수만큼 */
+.train { background: var(--train); border-radius: 26px 26px 10px 10px; padding: 14px 14px 18px; position: relative; }
+.train::after { /* 아래 선로 */
+  content: ""; position: absolute; left: 16px; right: 16px; bottom: -12px; height: 6px;
+  border-top: 2px solid var(--line-soft); border-bottom: 2px solid var(--line-soft);
+  background: repeating-linear-gradient(90deg, transparent 0 22px, var(--line-soft) 22px 26px);
+}
+.grid-days { display: grid; grid-template-columns: repeat(var(--n), minmax(260px, 1fr)); gap: 14px; }
+.pane { position: relative; height: 168px; border-radius: 22px; overflow: hidden;
+  box-shadow: inset 0 0 0 3px var(--train-2), 0 0 0 1px rgba(255,255,255,.05); }
+.pane::after { /* 유리 반사 */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, rgba(255,255,255,.26) 0 16%, transparent 16% 28%, rgba(255,255,255,.1) 28% 32%, transparent 32%);
+}
+.pane .label { position: absolute; left: 12px; bottom: 10px; display: flex; gap: 6px; z-index: 1; }
+.pane .label span { font-size: 11px; font-weight: 700; color: #fff; background: rgba(0,0,0,.3); padding: 3px 8px; border-radius: 999px; letter-spacing: .02em; }
+.pane .now { position: absolute; right: 12px; top: 10px; z-index: 1; display: flex; gap: 4px; }
+.pane .now b { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 11px;
+  background: rgba(255,255,255,.88); color: #23262d; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+.scene { display: block; width: 100%; height: 100%; }
+.scene .far path { fill: var(--l1); }
+.scene .near path { fill: var(--l2); }
+.scene .far { animation: drift 46s linear infinite; }
+.scene .near { animation: drift 16s linear infinite; }
+@keyframes drift { to { transform: translateX(-390px); } }
+
+/* ---------- 날짜 칸 ---------- */
+.cols { margin-top: 28px; }
+.col { min-width: 0; }
+.col-head { display: flex; align-items: baseline; gap: 8px; padding: 0 4px 8px; }
+.col-head h2 { margin: 0; font-size: 17px; }
+.col-head h2::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--line); margin-right: 7px; vertical-align: 1px; }
+.col-head small { color: var(--muted); font-size: 12px; }
+.col-head .cnt { margin-left: auto; font-size: 12px; color: var(--muted); }
+/* 칸 위 미니 노선: 역(점)을 양 끝까지 같은 간격으로, 뒤에 선 한 줄 */
+.mini { position: relative; height: 16px; margin: 0 6px 12px; display: flex; justify-content: space-between; align-items: center; }
+.mini::before { content: ""; position: absolute; left: 6px; right: 6px; top: 6px; height: 4px; border-radius: 2px; background: var(--line); }
+.mini.one { justify-content: center; } .mini.one::before { display: none; }
+.mini span { position: relative; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 3px solid var(--line); }
+.cards { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.card { position: relative; background: var(--card); border-radius: 14px; padding: 12px 12px 12px 14px;
+  border-left: 6px solid var(--tod); box-shadow: 0 1px 3px rgba(0,0,0,.06); display: grid; grid-template-columns: 62px 1fr; gap: 8px; }
+.card.tod-m { --tod: var(--tod-m); } .card.tod-d { --tod: var(--tod-d); } .card.tod-e { --tod: var(--tod-e); } .card.tod-n { --tod: var(--tod-n); }
+.card time { font-weight: 700; font-variant-numeric: tabular-nums; align-self: start; }
+.card time i { display: block; font-style: normal; font-size: 15px; margin-top: 2px; }
+.card .name { font-weight: 700; }
+.card .memo { margin: 3px 0 0; font-size: 13px; color: var(--muted); }
+.card .tags { display: flex; gap: 5px; margin-top: 7px; flex-wrap: wrap; }
+.card .tags span { font-size: 11px; padding: 2px 7px; border-radius: 999px; background: var(--chip); }
+.card .editing { position: absolute; top: -9px; right: 10px; font-size: 11px; padding: 2px 8px; border-radius: 999px;
+  background: var(--edit-bg); color: var(--edit-fg); animation: pulse 1.6s ease-in-out infinite; }
+.card.moved { animation: arrive .7s ease-out; }
+@keyframes pulse { 50% { opacity: .55; } }
+@keyframes arrive { from { box-shadow: 0 0 0 3px var(--line); transform: translateY(-4px); } }
+.add { margin-top: 10px; width: 100%; border: 1.5px dashed var(--line-soft); background: transparent; border-radius: 12px; padding: 10px; color: var(--muted); }
+.add:hover { border-color: var(--line); color: var(--fg); }
+
+/* ---------- 옆 패널 ---------- */
+.side { display: grid; gap: 16px; position: sticky; top: 16px; }
+.panel { background: var(--card); border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.panel h3 { margin: 0 0 10px; font-size: 14px; display: flex; justify-content: space-between; }
+.panel h3 a { font-size: 12px; color: var(--muted); font-weight: 400; text-decoration: none; }
+.settle-row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; }
+.settle-row b { font-variant-numeric: tabular-nums; }
+.settle-row.total { border-top: 1px solid var(--line-soft); margin-top: 4px; padding-top: 10px; color: var(--muted); font-size: 13px; }
+.check { display: flex; align-items: center; gap: 8px; font-size: 14px; padding: 5px 0; }
+.check input { accent-color: var(--train); width: 16px; height: 16px; }
+.check small { margin-left: auto; color: var(--muted); font-size: 11px; }
+.check.done span { text-decoration: line-through; color: var(--muted); }
+.feed { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.feed li { font-size: 13px; line-height: 1.45; display: grid; grid-template-columns: 26px 1fr; gap: 8px; }
+.feed li .av { width: 26px; height: 26px; font-size: 11px; border: 0; }
+.feed li small { display: block; color: var(--muted); font-size: 11px; }
+.feed li.fresh { animation: arrive .7s ease-out; border-radius: 8px; }
+.demo { border: 1px dashed var(--muted); background: transparent; color: var(--muted); border-radius: 10px; padding: 8px 10px; font-size: 12px; }
+
+/* 시안 전환 막대 */
+.switcher { position: fixed; right: 16px; bottom: 16px; z-index: 50; display: flex; gap: 6px; background: #111; padding: 8px 10px; border-radius: 12px; font-size: 13px; }
+.switcher a { color: #eee; background: #2a2a2e; border-radius: 8px; padding: 5px 9px; text-decoration: none; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav class="switcher" id="sw"></nav>
+
+<script>
+/* ---------- 예시 데이터 (지어낸 것) — Directions.html과 같은 여행 ---------- */
+const TRIP = { name: "후쿠오카 2박 3일", dates: "12.19 – 12.21 · 3명 · ¥ JPY" };
+const DAYS = [
+  { label: "1일차", sub: "12.19 금", line: "#f0714f", scene: "sea", sceneName: "바다 노을",
+    sky: { s1: "#ff8a65", s2: "#ffd59e", sun: "#fff3d6", l1: "#c2667a", l2: "#5b4a7a" } },
+  { label: "2일차", sub: "12.20 토", line: "#3f8f6b", scene: "mountain", sceneName: "산 · 온천 아침",
+    sky: { s1: "#7fc3ff", s2: "#e6f5ff", sun: "#fffbe8", l1: "#7aa98f", l2: "#3f6f5a" } },
+  { label: "3일차", sub: "12.21 일", line: "#3d7fd1", scene: "city", sceneName: "도시 · 공항",
+    sky: { s1: "#5aa0e6", s2: "#cfe8ff", sun: "#ffffff", l1: "#9fb3c8", l2: "#4d6178" } },
+];
+const STOPS = {
+  s1: { t: "10:40", name: "하카타역", memo: "짐은 역 코인로커에", tags: ["이동"] },
+  s2: { t: "12:00", name: "라멘 골목", memo: "줄 길면 옆 가게로", tags: ["맛집", "필수"] },
+  s3: { t: "14:30", name: "캐널시티", memo: "분수 쇼 15:00", tags: ["구경"], editing: "도윤" },
+  s4: { t: "19:00", name: "강변 포장마차", memo: "현금 챙기기", tags: ["맛집"] },
+  s5: { t: "09:30", name: "텐진 버스터미널", memo: "왕복표 미리", tags: ["이동"] },
+  s6: { t: "11:00", name: "온천 마을", memo: "족욕 + 산책", tags: ["필수"] },
+  s7: { t: "15:30", name: "호숫가 카페", memo: "", tags: ["카페"] },
+  s8: { t: "10:00", name: "신사 산책", memo: "오전에 덜 붐빔", tags: ["구경"] },
+  s9: { t: "13:00", name: "공항", memo: "출발 15:20", tags: ["이동"] },
+};
+const order = [["s1", "s2", "s3", "s4"], ["s5", "s6", "s7"], ["s8", "s9"]];
+const MEMBERS = [ { n: "나", on: true, day: 0 }, { n: "서", on: true, day: 1 }, { n: "도", on: true, day: 0 } ];
+const FEED = [
+  { who: "도", what: "<b>캐널시티</b> 메모를 고치는 중", when: "방금" },
+  { who: "서", what: "2일차에 <b>온천 마을</b>을 넣었어요", when: "3분 전" },
+  { who: "나", what: "1일차 순서를 바꿨어요", when: "10분 전" },
+];
+const q = new URLSearchParams(location.search);
+if (q.get("dark") === "1") document.documentElement.dataset.dark = "";
+const showEdit = q.get("edit") !== "0";
+let moved = null, demoDone = false;
+const tod = (t) => { const h = +t.slice(0, 2); return h < 11 ? "m" : h < 16 ? "d" : h < 19 ? "e" : "n"; };
+const TOD_ICON = { m: "🌅", d: "☀️", e: "🌇", n: "🌙" };
+
+/* 풍경: Directions.html과 같은 그림. 풍경 층은 두 벌을 이어 붙여 옆으로 흐르게 한다 */
+function sceneSvg(scene, uid) {
+  const far = {
+    sea: "M0 120 L40 98 L80 110 L130 84 L180 104 L230 90 L280 108 L330 92 L390 112 L390 180 L0 180Z",
+    mountain: "M0 128 L50 70 L95 112 L150 52 L210 118 L255 80 L310 120 L350 88 L390 126 L390 180 L0 180Z",
+    city: "M0 124 h30 v-26 h22 v26 h18 v-44 h26 v44 h20 v-30 h30 v30 h24 v-56 h20 v56 h28 v-22 h34 v22 h22 v-38 h26 v38 h70 v56 H0Z",
+  }[scene];
+  const near = {
+    sea: "M0 140 Q 25 132 50 140 T 100 140 T 150 140 T 200 140 T 250 140 T 300 140 T 350 140 T 400 140 L400 180 L0 180Z",
+    mountain: "M0 150 Q 60 128 120 146 T 240 142 T 390 148 L390 180 L0 180Z",
+    city: "M0 152 L390 152 L390 180 L0 180Z",
+  }[scene];
+  const layer = (p, cls) => `<g class="${cls}"><path d="${p}"/><path d="${p}" transform="translate(390 0)"/></g>`;
+  return `<svg class="scene" viewBox="0 0 390 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><linearGradient id="sky-${uid}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" style="stop-color:var(--s1)"/><stop offset="1" style="stop-color:var(--s2)"/></linearGradient></defs>
+    <rect width="390" height="180" fill="url(#sky-${uid})"/>
+    <circle cx="300" cy="${scene === "sea" ? 108 : 56}" r="26" style="fill:var(--sun)"/>
+    ${layer(far, "far")}${layer(near, "near")}
+  </svg>`;
+}
+const miniRoute = (ids) => ids.map(id => `<span title="${STOPS[id].name}"></span>`).join("");
+
+function draw() {
+  const vars = (o) => Object.entries(o).map(([k, v]) => `--${k}:${v}`).join(";");
+  document.getElementById("app").innerHTML = `
+  <header class="bar">
+    <div class="brand"><i></i>Itinerail</div>
+    <div class="trip"><h1>${TRIP.name}</h1><span>${TRIP.dates}</span></div>
+    <div class="spacer"></div>
+    <div class="members">${MEMBERS.map(m => `<span class="av" title="${m.n}">${m.n}${m.on ? `<span class="dot"></span>` : ""}</span>`).join("")}</div>
+    <button class="btn">초대</button><button class="btn primary">＋ 일정</button>
+  </header>
+  <div class="main">
+    <section class="journey" style="--n:${DAYS.length}">
+      <div class="train"><div class="grid-days">
+        ${DAYS.map((d, i) => `<div class="pane" style="${vars(d.sky)}">${sceneSvg(d.scene, "p" + i)}
+          <div class="label"><span>${d.label} · ${d.sub}</span><span>${d.sceneName}</span></div>
+          <div class="now">${MEMBERS.filter(m => m.on && m.day === i && m.n !== "나").map(m => `<b title="${m.n} 보는 중">${m.n}</b>`).join("")}</div>
+        </div>`).join("")}
+      </div></div>
+      <div class="grid-days cols">
+        ${DAYS.map((d, i) => `<div class="col" style="--line:${d.line}">
+          <div class="col-head"><h2>${d.label}</h2><small>${d.sub}</small><span class="cnt">${order[i].length}곳</span></div>
+          <div class="mini ${order[i].length === 1 ? "one" : ""}">${miniRoute(order[i])}</div>
+          <ol class="cards">${order[i].map(id => { const s = STOPS[id]; const k = tod(s.t); return `
+            <li class="card tod-${k} ${moved === id ? "moved" : ""}" style="view-transition-name:c-${id}">
+              <time>${s.t}<i>${TOD_ICON[k]}</i></time>
+              <div><div class="name">${s.name}</div>${s.memo ? `<p class="memo">${s.memo}</p>` : ""}
+                <div class="tags">${s.tags.map(t => `<span>${t}</span>`).join("")}</div></div>
+              ${showEdit && s.editing ? `<span class="editing">${s.editing} 편집 중</span>` : ""}
+            </li>`; }).join("")}</ol>
+          <button class="add">＋ ${d.label}에 일정 추가</button>
+        </div>`).join("")}
+      </div>
+    </section>
+    <aside class="side">
+      <div class="panel"><h3>정산 <a href="#">자세히</a></h3>
+        <div class="settle-row"><span>도윤에게 보내기</span><b>¥3,200</b></div>
+        <div class="settle-row"><span>서연이 나에게</span><b>¥1,800</b></div>
+        <div class="settle-row total"><span>지금까지 쓴 돈</span><b>¥48,600</b></div>
+      </div>
+      <div class="panel"><h3>준비물 <a href="#">2 / 4</a></h3>
+        ${[["여권", true, "나"], ["엔화 현금", true, "서연"], ["보조배터리", false, ""], ["온천 수건", false, ""]].map(([n, c, w]) =>
+          `<label class="check ${c ? "done" : ""}"><input type="checkbox" ${c ? "checked" : ""}><span>${n}</span>${w ? `<small>${w}</small>` : ""}</label>`).join("")}
+      </div>
+      <div class="panel"><h3>방금 바뀐 것</h3>
+        <ol class="feed">${FEED.map((f, i) => `<li class="${i === 0 && demoDone ? "fresh" : ""}"><span class="av">${f.who}</span><div>${f.what}<small>${f.when}</small></div></li>`).join("")}</ol>
+      </div>
+      <button class="demo" id="demo">${demoDone ? "데모 되돌리기" : "옮기기 데모: 서연이 '호숫가 카페'를 1일차로"}</button>
+    </aside>
+  </div>`;
+  document.getElementById("demo").onclick = () => go(() => {
+    if (!demoDone) {
+      order[1].splice(order[1].indexOf("s7"), 1); order[0].push("s7"); moved = "s7";
+      FEED.unshift({ who: "서", what: "<b>호숫가 카페</b>를 1일차로 옮겼어요", when: "방금" });
+    } else {
+      order[0].splice(order[0].indexOf("s7"), 1); order[1].push("s7"); moved = "s7"; FEED.shift();
+    }
+    demoDone = !demoDone;
+  });
+}
+function go(fn) { document.startViewTransition ? document.startViewTransition(() => { fn(); draw(); }) : (fn(), draw()); }
+draw();
+
+/* 시안 전환 막대: 다크 · 편집 중 표시 · 모바일 시안으로 */
+const link = (p) => { const u = new URLSearchParams(q); Object.entries(p).forEach(([k, v]) => v === null ? u.delete(k) : u.set(k, v)); return "?" + u; };
+document.getElementById("sw").innerHTML =
+  `<a href="${link({ dark: q.get("dark") === "1" ? null : "1" })}">${q.get("dark") === "1" ? "라이트" : "다크"}</a>` +
+  `<a href="${link({ edit: showEdit ? "0" : null })}">편집 중 ${showEdit ? "끄기" : "켜기"}</a>` +
+  `<a href="Directions.html?d=E${q.get("dark") === "1" ? "&dark=1" : ""}">모바일(E)</a>`;
+</script>
+</body>
+</html>
