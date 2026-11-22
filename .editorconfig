@@ -1,0 +1,19 @@
+# 편집기마다 다른 습관(인코딩 · 줄바꿈 · 들여쓰기)을 이 파일 하나로 맞춘다
+# 비유: 공용 프린터 옆에 붙여 둔 "용지는 A4, 양면 금지" 안내문
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Markdown은 줄 끝 공백 두 개가 "줄바꿈" 뜻일 수 있어서 지우지 않는다
+[*.md]
+trim_trailing_whitespace = false
+
+# .gitattributes와 같게 Windows 스크립트는 CRLF
+[*.{ps1,cmd,bat}]
+end_of_line = crlf
