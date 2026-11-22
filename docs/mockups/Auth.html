@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Itinerail 가입 · 로그인</title>
+<!-- 목업이라 글꼴은 CDN. 실제 구현은 글꼴 파일을 직접 내려 준다 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+/* ============================================================
+   가입 · 로그인 — E 기차 창가 (값은 DESIGN 3 ~ 6장)
+   흐름은 phx.gen.auth(Phoenix 1.8.17) 그대로: 가입은 메일만 → 확인 메일,
+   로그인은 매직 링크(15분) 기본 + 비밀번호는 설정에서 켠 사람만, 로그인 유지 14일
+   ============================================================ */
+:root {
+  --bg: #f2f0eb; --fg: #23262d; --muted: #656a75; --card: #ffffff; --chip: #e5e2da; --line-soft: #dcd8ce;
+  --train: #2f3a44; --train-2: #3a4652; --btn-fg: #ffffff;
+  --danger: #b4381f; --success: #2e7d4f;   /* 새로: 카드 위 5.96 · 5.05 */
+  --ink1: #d63c12;
+  --font: "Pretendard", system-ui, sans-serif;
+}
+:root[data-dark] {
+  --bg: #14171d; --fg: #eceef2; --muted: #9aa0ad; --card: #1e232b; --chip: #2a303a; --line-soft: #2c323c;
+  --train: #0b0d11; --train-2: #1a1f27; --btn-fg: #14171d;
+  --danger: #ff8f78; --success: #6fd39a;   /* 카드 위 7.10 · 8.61 */
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 24px 16px 72px; background: #e4e2dd; color: var(--fg); font-family: var(--font); }
+:root[data-dark] body { background: #0b0d11; }
+.head { max-width: 1760px; margin: 0 auto 18px; }
+.head h1 { font-size: 20px; margin: 0 0 6px; }
+.head p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.head code { font-size: 12px; background: var(--card); padding: 1px 5px; border-radius: 4px; }
+.board { display: grid; gap: 26px; justify-content: center; grid-template-columns: repeat(auto-fill, 390px); max-width: 1760px; margin: 0 auto; }
+.slot h2 { font-size: 14px; margin: 0 0 8px; color: var(--fg); }
+.slot h2 small { color: var(--muted); font-weight: 400; }
+.phone { width: 390px; height: 780px; border-radius: 28px; overflow: hidden; position: relative; background: var(--bg);
+  box-shadow: 0 0 0 8px #1b1b1f, 0 18px 40px rgba(0,0,0,.25); }
+.desk-wrap { max-width: 1760px; margin: 40px auto 0; }
+.desk { width: 1280px; height: 760px; margin: 0 auto; border-radius: 14px; overflow: hidden; background: var(--bg);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.1), 0 18px 40px rgba(0,0,0,.2); transform-origin: top left; }
+.single .board { grid-template-columns: 390px; }
+
+/* ---------- 창문 · 풍경 (일정 판과 같은 그림) ---------- */
+.window { position: relative; overflow: hidden; border: 10px solid var(--train); border-radius: 30px;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.12), 0 8px 18px rgba(0,0,0,.18); }
+.window::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, rgba(255,255,255,.28) 0 18%, transparent 18% 30%, rgba(255,255,255,.12) 30% 34%, transparent 34%); }
+.scene { display: block; width: 100%; height: 100%; }
+.scene .far path { fill: var(--l1); } .scene .near path { fill: var(--l2); }
+.scene .far { animation: drift 46s linear infinite; } .scene .near { animation: drift 16s linear infinite; }
+@keyframes drift { to { transform: translateX(-390px); } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+.brand { position: absolute; left: 14px; top: 12px; z-index: 1; display: flex; align-items: center; gap: 7px;
+  font-weight: 800; font-size: 15px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.25); letter-spacing: -.01em; }
+.brand i { width: 18px; height: 18px; border-radius: 6px; background: linear-gradient(#ff8a65, #ffd59e); box-shadow: 0 0 0 2px rgba(255,255,255,.6); }
+.where { position: absolute; left: 14px; bottom: 10px; z-index: 1; font-size: 11px; font-weight: 700; color: #fff;
+  background: rgba(0,0,0,.28); padding: 3px 8px; border-radius: 999px; }
+
+/* ---------- 모바일 화면 ---------- */
+.m { height: 100%; overflow-y: auto; display: flex; flex-direction: column; }
+.m .window { margin: 14px 14px 0; height: 236px; flex: 0 0 auto; }
+.m .body { padding: 24px 22px 28px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+.slot .title { margin: 0; font-size: 24px; color: var(--fg); font-weight: 800; letter-spacing: -.02em; line-height: 1.3; }
+.sub { margin: -6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.field { display: grid; gap: 6px; }
+.field label { font-size: 13px; font-weight: 600; }
+.field input { font: inherit; font-size: 16px; padding: 13px 14px; border-radius: 10px; border: 1.5px solid var(--line-soft);
+  background: var(--card); color: var(--fg); outline: none; }
+.field input:focus { border-color: var(--train); box-shadow: 0 0 0 3px color-mix(in srgb, var(--train) 18%, transparent); }
+:root[data-dark] .field input:focus { border-color: var(--fg); }
+.field.err input { border-color: var(--danger); }
+.field .msg { font-size: 13px; color: var(--danger); display: flex; gap: 5px; }
+.btn { font: inherit; font-weight: 700; font-size: 15px; border: 0; border-radius: 10px; padding: 14px; cursor: pointer;
+  background: var(--train); color: #fff; display: flex; justify-content: center; align-items: center; gap: 8px; }
+:root[data-dark] .btn { background: var(--fg); color: var(--btn-fg); }
+.btn.soft { background: var(--chip); color: var(--fg); }
+.btn[disabled] { opacity: .7; cursor: default; }
+.spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.link { font-size: 14px; color: var(--muted); text-align: center; }
+.link a { color: var(--fg); font-weight: 700; text-decoration: none; border-bottom: 1.5px solid var(--line-soft); }
+.or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; }
+.or::before, .or::after { content: ""; flex: 1; border-top: 1px solid var(--line-soft); }
+details.pw summary { list-style: none; cursor: pointer; text-align: center; font-size: 14px; color: var(--muted); }
+details.pw summary::-webkit-details-marker { display: none; }
+details.pw summary::after { content: " ▾"; }
+details.pw[open] summary::after { content: " ▴"; }
+details.pw .inner { display: grid; gap: 12px; margin-top: 14px; }
+.notice { display: flex; gap: 12px; align-items: flex-start; background: var(--card); border-radius: 14px; padding: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06); font-size: 14px; line-height: 1.5; }
+.notice .ic { width: 38px; height: 38px; border-radius: 50%; flex: 0 0 auto; display: grid; place-items: center; font-size: 18px; background: var(--chip); }
+.notice b { display: block; }
+.notice.ok { border-left: 6px solid var(--success); }
+.notice.bad { border-left: 6px solid var(--danger); }
+.notice .mail { font-weight: 700; color: var(--fg); }
+.invite { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center; background: var(--card); border-radius: 14px;
+  padding: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.06); border-left: 6px solid #f0714f; }
+.invite .thumb { width: 56px; height: 56px; border-radius: 12px; overflow: hidden; box-shadow: inset 0 0 0 2px var(--train-2); }
+.invite p { margin: 0; font-size: 14px; line-height: 1.45; }
+.invite small { color: var(--muted); font-size: 12px; }
+.fine { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.5; margin-top: auto; }
+.dev { font-size: 12px; border: 1px dashed var(--line-soft); border-radius: 10px; padding: 8px 10px; color: var(--muted); }
+
+/* ---------- PC: 왼쪽 큰 창문 | 오른쪽 양식 ---------- */
+.d { display: grid; grid-template-columns: 1.35fr 1fr; height: 100%; }
+.d .left { background: var(--train); padding: 28px; display: flex; flex-direction: column; gap: 18px; position: relative; }
+.d .left .window { flex: 1; border-width: 12px; border-color: var(--train-2); border-radius: 34px; }
+.d .left .tag { color: #fff; }
+.d .left .tag b { display: block; font-size: 30px; letter-spacing: -.02em; line-height: 1.25; }
+.d .left .tag span { color: rgba(255,255,255,.7); font-size: 15px; }
+.d .left .rail { height: 8px; border-top: 2px solid #4b5866; border-bottom: 2px solid #4b5866;
+  background: repeating-linear-gradient(90deg, transparent 0 22px, #4b5866 22px 26px); }
+.d .right { display: flex; align-items: center; justify-content: center; padding: 40px; }
+.d .right .body { width: 380px; display: flex; flex-direction: column; gap: 14px; }
+
+.switcher { position: fixed; right: 16px; bottom: 16px; z-index: 50; display: flex; gap: 6px; flex-wrap: wrap; max-width: 92vw;
+  background: #111; padding: 8px 10px; border-radius: 12px; font-size: 13px; }
+.switcher a { color: #eee; background: #2a2a2e; border-radius: 8px; padding: 5px 9px; text-decoration: none; }
+.switcher a.cur { background: #f5f5f5; color: #111; }
+</style>
+</head>
+<body>
+<header class="head" id="head">
+  <h1>Itinerail · 가입 · 로그인 (M1 첫 작업)</h1>
+  <p>E 기차 창가 방향, 값은 DESIGN 3 ~ 6장. 흐름은 <code>phx.gen.auth</code>(Phoenix 1.8.17) 그대로 — 가입은 메일만, 로그인은 매직 링크(15분) 기본 + 비밀번호는 설정에서 켠 사람만. 예시 메일 · 이름은 지어낸 것이다.<br>
+  하나만 크게: <code>?s=login</code> (<code>login · password · loading · error · sent · register · registered · confirm · expired · invite</code>) · 다크 <code>&amp;dark=1</code> · PC는 맨 아래</p>
+</header>
+<main class="board" id="board"></main>
+<section class="desk-wrap" id="deskwrap"><div class="slot"><h2>PC 로그인 <small>1280 × 760</small></h2><div class="desk" id="desk"></div></div></section>
+<nav class="switcher" id="sw"></nav>
+
+<script>
+const q = new URLSearchParams(location.search);
+const dark = q.get("dark") === "1";
+if (dark) document.documentElement.dataset.dark = "";
+const MAIL = "minji@example.com";
+
+/* 풍경: 일정 판과 같은 모양 · 색(DESIGN 3장 풍경 표). 화면마다 다른 풍경을 띄운다 */
+const FAR = {
+  sea: "M0 120 L40 98 L80 110 L130 84 L180 104 L230 90 L280 108 L330 92 L390 112 L390 180 L0 180Z",
+  mountain: "M0 128 L50 70 L95 112 L150 52 L210 118 L255 80 L310 120 L350 88 L390 126 L390 180 L0 180Z",
+  city: "M0 124 h30 v-26 h22 v26 h18 v-44 h26 v44 h20 v-30 h30 v30 h24 v-56 h20 v56 h28 v-22 h34 v22 h22 v-38 h26 v38 h70 v56 H0Z",
+  field: "M0 132 Q 100 112 200 126 T 390 120 L390 180 L0 180Z",
+  snow: "M0 130 L60 64 L80 80 L120 40 L170 110 L230 58 L260 76 L300 50 L350 104 L390 90 L390 180 L0 180Z",
+  desert: "M0 140 Q 70 104 150 132 Q 230 96 310 128 Q 350 112 390 124 L390 180 L0 180Z",
+};
+const NEAR = {
+  sea: "M0 140 Q 25 132 50 140 T 100 140 T 150 140 T 200 140 T 250 140 T 300 140 T 350 140 T 400 140 L400 180 L0 180Z",
+  mountain: "M0 150 Q 60 128 120 146 T 240 142 T 390 148 L390 180 L0 180Z",
+  city: "M0 152 L390 152 L390 180 L0 180Z",
+  field: "M0 150 L20 144 L22 150 L60 146 L62 150 L110 145 L112 150 L170 146 L172 150 L240 144 L242 150 L320 146 L322 150 L390 147 L390 180 L0 180Z",
+  snow: "M0 152 Q 90 140 180 150 T 390 148 L390 180 L0 180Z",
+  desert: "M0 156 Q 120 146 240 154 T 390 152 L390 180 L0 180Z",
+};
+const PAL = {
+  sea: ["#ff8a65", "#ffd59e", "#fff3d6", "#c2667a", "#5b4a7a", "바다 노을"],
+  mountain: ["#7fc3ff", "#e6f5ff", "#fffbe8", "#7aa98f", "#3f6f5a", "산 · 온천 아침"],
+  city: ["#5aa0e6", "#cfe8ff", "#ffffff", "#9fb3c8", "#4d6178", "도시 · 공항"],
+  field: ["#9ad0ec", "#f4f1d0", "#fff6c2", "#a8c47a", "#6f8f45", "들판 · 시골길"],
+  snow: ["#b8c9e8", "#f3f6fb", "#ffffff", "#dfe7f2", "#8a9bb8", "설산 · 겨울"],
+  desert: ["#f2a65a", "#fbe3b8", "#fff1d0", "#d9925a", "#a0603a", "사막 · 해 질 녘"],
+};
+let uid = 0;
+function scene(k) {
+  const [s1, s2, sun, l1, l2] = PAL[k], id = "g" + (uid++);
+  const lay = (p, c) => `<g class="${c}"><path d="${p}"/><path d="${p}" transform="translate(390 0)"/></g>`;
+  return `<svg class="scene" viewBox="0 0 390 180" preserveAspectRatio="xMidYMid slice" style="--l1:${l1};--l2:${l2}" aria-hidden="true">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s1}"/><stop offset="1" stop-color="${s2}"/></linearGradient></defs>
+    <rect width="390" height="180" fill="url(#${id})"/><circle cx="300" cy="${k === "sea" || k === "desert" ? 112 : 54}" r="24" fill="${sun}"/>
+    ${lay(FAR[k], "far")}${lay(NEAR[k], "near")}</svg>`;
+}
+const win = (k, extra = "") => `<div class="window">${scene(k)}<div class="brand"><i></i>Itinerail</div><span class="where">창밖 · ${PAL[k][5]}</span>${extra}</div>`;
+const field = (o = {}) => `<div class="field ${o.err ? "err" : ""}"><label for="e${uid}">메일 주소</label>
+  <input id="e${uid}" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" value="${o.value || ""}">
+  ${o.err ? `<span class="msg">⚠ ${o.err}</span>` : ""}</div>`;
+const pwBlock = (open) => `<div class="or">또는</div><details class="pw" ${open ? "open" : ""}><summary>비밀번호로 로그인</summary><div class="inner">
+  ${field({ value: open ? MAIL : "" })}
+  <div class="field"><label>비밀번호</label><input type="password" autocomplete="current-password" value="${open ? "••••••••••" : ""}"></div>
+  <button class="btn">로그인 유지 →</button><button class="btn soft">이번만 로그인</button>
+  <p class="fine" style="margin:0">비밀번호는 설정에서 켠 사람만 써요. 로그인 유지는 14일이에요.</p></div></details>`;
+
+/* ---------- 화면 (본문만 — 모바일 · PC가 같이 쓴다) ---------- */
+const S = {
+  login: { t: "로그인", scene: "sea", body: () => `
+    <h2 class="title">어디로 떠나 볼까요?</h2><p class="sub">메일로 로그인 링크를 보내 드릴게요. 비밀번호는 없어도 돼요.</p>
+    ${field()}<button class="btn">로그인 링크 받기 →</button>${pwBlock(false)}
+    <p class="link">처음이에요 · <a href="?s=register">가입하기</a></p>` },
+  password: { t: "로그인 · 비밀번호 펼침", scene: "sea", body: () => `
+    <h2 class="title">어디로 떠나 볼까요?</h2><p class="sub">메일로 로그인 링크를 보내 드릴게요. 비밀번호는 없어도 돼요.</p>
+    ${field()}<button class="btn">로그인 링크 받기 →</button>${pwBlock(true)}` },
+  loading: { t: "보내는 중", scene: "sea", body: () => `
+    <h2 class="title">어디로 떠나 볼까요?</h2><p class="sub">메일로 로그인 링크를 보내 드릴게요. 비밀번호는 없어도 돼요.</p>
+    ${field({ value: MAIL })}<button class="btn" disabled><span class="spin"></span>보내는 중…</button>` },
+  error: { t: "입력 오류", scene: "sea", body: () => `
+    <h2 class="title">어디로 떠나 볼까요?</h2><p class="sub">메일로 로그인 링크를 보내 드릴게요. 비밀번호는 없어도 돼요.</p>
+    ${field({ value: "minji@example", err: "메일 주소 형식을 확인해 주세요" })}<button class="btn">로그인 링크 받기 →</button>
+    <div class="notice bad"><span class="ic">🔒</span><div><b>메일 주소나 비밀번호가 맞지 않아요</b>비밀번호로 로그인할 때만 나오는 알림이에요.</div></div>` },
+  sent: { t: "링크 보냄", scene: "mountain", body: () => `
+    <div class="notice ok"><span class="ic">✉️</span><div><b>메일함을 확인해 주세요</b>가입된 메일 주소라면 로그인 링크를 보냈어요. 링크는 <b style="display:inline">15분</b> 동안 한 번만 쓸 수 있어요.</div></div>
+    <p class="sub" style="margin:0">메일이 안 오면 스팸함도 봐 주세요.</p>
+    <button class="btn soft">다른 메일로 다시 받기</button>
+    <div class="dev">개발 중에는 실제 메일 대신 <b>/dev/mailbox</b>에서 볼 수 있어요. <i>(개발 환경에서만 보이는 줄)</i></div>` },
+  register: { t: "가입", scene: "field", body: () => `
+    <h2 class="title">처음 오셨네요</h2><p class="sub">메일 주소만 있으면 돼요. 비밀번호는 나중에 설정에서 만들 수 있어요.</p>
+    ${field()}<button class="btn">가입 메일 받기 →</button>
+    <p class="link">이미 계정이 있어요 · <a href="?s=login">로그인</a></p>
+    <p class="fine">가입하면 여행 일정 · 정산에 쓰는 정보만 저장해요.</p>` },
+  registered: { t: "가입 메일 보냄", scene: "field", body: () => `
+    <div class="notice ok"><span class="ic">🎫</span><div><b>승차권이 발급됐어요</b><span class="mail">${MAIL}</span>으로 가입 확인 메일을 보냈어요. 메일의 링크를 누르면 바로 탈 수 있어요.</div></div>
+    <p class="sub" style="margin:0">링크는 15분 동안 쓸 수 있어요. 지나면 로그인 화면에서 새로 받으면 돼요.</p>
+    <button class="btn soft">메일 앱 열기</button>` },
+  confirm: { t: "링크 열었을 때", scene: "city", body: () => `
+    <h2 class="title">어서 오세요</h2><p class="sub">${MAIL}</p>
+    <button class="btn">이 기기에서 로그인 유지 →</button><button class="btn soft">이번만 로그인</button>
+    <p class="fine" style="margin-top:4px">로그인 유지는 14일이에요. 공용 기기라면 "이번만"을 눌러 주세요.</p>
+    <div class="notice"><span class="ic">🔑</span><div><b>비밀번호가 편하세요?</b>설정에서 비밀번호를 켤 수 있어요.</div></div>` },
+  expired: { t: "링크 만료", scene: "snow", body: () => `
+    <div class="notice bad"><span class="ic">⏱️</span><div><b>링크가 만료됐어요</b>로그인 링크는 15분 동안, 한 번만 쓸 수 있어요. 새 링크를 받아 주세요.</div></div>
+    ${field({ value: MAIL })}<button class="btn">새 링크 받기 →</button>` },
+  invite: { t: "초대받고 들어왔을 때 (M3)", scene: "sea", body: () => `
+    <div class="invite"><div class="thumb">${scene("sea")}</div><p><b>서연님이 '후쿠오카 2박 3일'에 초대했어요</b><br><small>12.19 – 12.21 · 멤버 3명</small></p></div>
+    <h2 class="title" style="font-size:21px">같이 떠나 볼까요?</h2><p class="sub">로그인하면 바로 일정 판으로 들어가요. 계정이 없으면 이 메일로 가입돼요.</p>
+    ${field({ value: "doyun@example.com" })}<button class="btn">초대 수락하고 링크 받기 →</button>` },
+};
+
+/* ---------- 그리기 ---------- */
+const board = document.getElementById("board");
+const only = q.get("s");
+const keys = only && S[only] ? [only] : Object.keys(S);
+if (only) { document.body.classList.add("single"); document.getElementById("head").hidden = true; }
+for (const k of keys) {
+  const s = S[k];
+  board.insertAdjacentHTML("beforeend", `<section class="slot"><h2>${s.t} <small>?s=${k}</small></h2>
+    <div class="phone"><div class="m">${win(s.scene)}<div class="body">${s.body()}</div></div></div></section>`);
+}
+/* PC는 로그인 화면 하나: 왼쪽 큰 창문 + 기차 띠, 오른쪽 양식 */
+const dk = only && S[only] ? only : "login";
+document.getElementById("desk").innerHTML = `<div class="d">
+  <div class="left">${win(S[dk].scene)}<div class="rail"></div>
+    <div class="tag"><b>다음 여행, 같이 짜요</b><span>창밖으로 지나가는 풍경처럼 일정도 함께 흘러가요.</span></div></div>
+  <div class="right"><div class="body">${S[dk].body()}</div></div></div>`;
+/* PC 틀이 화면보다 넓으면 줄여 보인다 */
+const fit = () => { const d = document.getElementById("desk"), w = d.parentElement.clientWidth; const s = Math.min(1, w / 1280);
+  d.style.transform = `scale(${s})`; d.parentElement.style.height = (760 * s + 30) + "px"; };
+addEventListener("resize", fit); fit();
+
+const link = (p) => { const u = new URLSearchParams(q); Object.entries(p).forEach(([k, v]) => v === null ? u.delete(k) : u.set(k, v)); return "?" + u; };
+document.getElementById("sw").innerHTML = (only ? Object.keys(S).map(k => `<a class="${k === only ? "cur" : ""}" href="${link({ s: k })}">${k}</a>`).join("") + `<a href="${link({ s: null })}">보드로</a>` : "")
+  + `<a href="${link({ dark: dark ? null : "1" })}">${dark ? "라이트" : "다크"}</a>`;
+</script>
+</body>
+</html>
