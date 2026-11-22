@@ -58,7 +58,8 @@
 - [x] `git init` · GitHub 공개 저장소 `sagming40/Itinerail` · 원격 연결(사용자), 첫 커밋 `6f369c9` · push (2026-11-22)
 - [x] 저장소 설정 파일 `.gitattributes` · `.editorconfig` · `.gitignore` (사용자, 2026-11-22)
 - [ ] 하위 주소(`*.sagming.com`)
-- [ ] 디자인 방향 한 문장 → 목업 시안 비교 → [DESIGN.md](DESIGN.md) 확정 값
+- [x] 디자인 방향 한 문장 → 목업 시안 비교 → [DESIGN.md](DESIGN.md) 확정 값 — 방향 E 기차 창가, 색 · 글꼴(Pretendard) · 모양 · 움직임 3 ~ 6장 (2026-11-22)
+- [x] 카드 순서 규칙 — 시간순 자동(decisions 0004) *(계획에 없던 작업)*
 - [x] 작업 방식 — 코드는 타이핑 학습 모드(프로젝트 CLAUDE.md, 2026-11-22)
 - **완료 기준**: DESIGN에 방향 · 색 · 글꼴 · 모양 · 움직임 표가 있고, [mockups/README.md](mockups/README.md)에 고른 시안이 "채택"
 
