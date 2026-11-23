@@ -25,13 +25,13 @@
 기본은 전역 설정 "작업 방식" 절이다. **전역 작업 방식과 다르게** 이 저장소는 아래를 따른다 — Elixir · Phoenix · LiveView · OTP가 전부 처음이라 손으로 익히는 게 목적이다(2026-11-22 사용자 결정, minor-stacks와 같은 방식).
 
 - **코드는 기본이 타이핑 학습 모드**: Claude는 파일에 코드를 쓰지 않고, 비유를 곁들인 주석을 단 코드를 보여 준다. 사용자가 치고 "코드 검수!"라고 하면 오타 · 버그를 리뷰한다. 수정 지시는 "파일 위치 + 지금 코드 + 바꿀 코드"로.
-  - 코드에 해당하는 것: Elixir(`.ex` · `.exs`), HEEx 템플릿, 우리가 쓰는 CSS · JS(훅 포함), Ecto 마이그레이션, `mix.exs` · `config/*.exs`, Dockerfile · compose · Taskfile · CI 워크플로, `assets/package.json`.
+  - 코드에 해당하는 것: Elixir(`.ex` · `.exs`), HEEx 템플릿, 우리가 쓰는 CSS · JS(훅 포함), Ecto 마이그레이션, `mix.exs` · `config/*.exs`, Dockerfile · compose · CI 워크플로, 직접 만드는 Mix 태스크(`lib/mix/tasks/`), `assets/package.json`.
   - **`mix` 생성기 명령(`mix phx.new` · `mix phx.gen.auth` · `mix ecto.gen.migration` 등)도 사용자가 친다.** Claude는 명령과 "무엇이 생기는지"를 먼저 보여 주고, 생긴 파일을 같이 읽는다.
   - **`iex`에서도 같다**: Claude는 평가할 식을 보여 주고, 사용자가 `iex -S mix`에서 친다.
 - **자동 작업은 사용자가 요청할 때만** 한다. 익숙한 것이라도 Claude가 먼저 파일에 쓰지 않는다.
 - **도구 설치 · 의존성은 사용자가 직접 받는다**: Elixir 설치, `mix.exs`의 `deps`에 줄 넣기 · `mix deps.get`, npm 패키지 모두. 큰 작업 전에 필요한 목록과 "왜 필요한지"를 먼저 보여 준다. (전역의 "자동 작업 중 미리 못 본 의존성은 Claude가 설치" 예외는 여기선 쓰지 않는다 — 자동 작업이 기본이 아니어서다.)
 - **처음 나오는 것은 설명부터**: 짧게, 일상 비유로, 이 앱 어디에 쓰는지까지. 사용자가 아는 것에 빗대면 잘 통한다 — Clojure(불변 데이터 · REPL), Gleam(BEAM · 프로세스 · 패턴 매칭), Go · sqlc · goose, Python · SQLAlchemy · Alembic, React, HTMX.
-- **이미 익숙한 것**은 개념 설명을 줄이고 이 스택에서 달라지는 점만 짚는다: Tailwind · daisyUI, PostgreSQL · SQL, Docker Compose, Task, GitHub Actions, PlayLedger 배포 방식.
+- **이미 익숙한 것**은 개념 설명을 줄이고 이 스택에서 달라지는 점만 짚는다: Tailwind · daisyUI, PostgreSQL · SQL, Docker Compose, GitHub Actions, PlayLedger 배포 방식.
 - **문서 작성 · 목업 · 커밋 · push는 Claude가 알아서** 한다(저장소가 생긴 뒤). 사용자는 코드 타이핑에 집중한다.
 - 그 밖(사전 검증 · 검증 관찰값 · 마일스톤 닫기 전 점검)은 전역 설정 그대로.
 

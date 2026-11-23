@@ -1,6 +1,6 @@
 # 0001. 스택은 Elixir + Phoenix + LiveView, 생성기 기본값을 뼈대로
 
-- 상태: 채택
+- 상태: 채택 (명령 묶기 "mix 별칭 + Task"는 [0005](0005-commands-mix-only.md)가 대체)
 - 날짜: 2026-11-22
 
 ## 맥락

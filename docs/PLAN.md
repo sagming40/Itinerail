@@ -31,7 +31,8 @@
 | View Transitions (`onDocumentPatch`) | 날짜 바꾸기 · 카드 → 상세 |
 | CSS 스크롤 연동 | **돌아보기 화면의 주인공** — 내려가면 날짜별 동선이 차례로 그려진다 |
 | Elixir behaviour | **장소 검색 어댑터** — 국내 · 해외 공급자를 같은 함수 모양 뒤에 숨긴다([decisions/0003](decisions/0003-place-search-providers.md)) |
-| mix 별칭 + Task · CI/CD | research/final-choice-elixir.md 5 · 6장 |
+| mix 별칭 · Mix 태스크 | 명령 묶기 전부 — `mix db` · `mix dev` · `mix ci` · `mix deploy`([decisions/0005](decisions/0005-commands-mix-only.md)) |
+| CI/CD | research/final-choice-elixir.md 6장 |
 
 ## 2. 진행 현황
 
@@ -67,8 +68,9 @@
 - [x] 첫 작업: 가입 · 로그인 화면 목업(`mockups/Auth.html`) · 상태 · 문구를 DESIGN 7.1에 *(M0 점검에서 미룸)* (2026-11-22)
 - [x] Elixir 1.20.5 · Hex · phx_new 1.8.17 설치(사용자, 2026-11-22)
 - [x] `mix phx.new . --app itinerail --binary-id`(사용자, 커밋 `eb44fce`, 2026-11-22)
-- [ ] 개발 DB(Docker Postgres 18, 포트 5440) · 첫 `mix phx.server`
-- [ ] `phx.gen.auth --hashing-lib argon2` · daisyUI 테마(DESIGN 3 ~ 6장) · `mix ci` 별칭 · Taskfile · CI · release 이미지 · 배포
+- [x] 개발 DB(Docker Postgres 18, 포트 5440) · 첫 `mix phx.server`(집 PC, 커밋 `bec8c75`, 2026-11-23)
+- [ ] `mix db` · `mix dev` 별칭(decisions 0005 — Taskfile 대신)
+- [ ] `phx.gen.auth --hashing-lib argon2` · daisyUI 테마(DESIGN 3 ~ 6장) · `mix ci` 별칭 · CI · release 이미지 · `mix deploy` · 배포
 - **완료 기준**: `mix ci` 통과, CI 초록, **휴대폰(LTE)으로 하위 주소에서 가입 → 매직 링크 로그인**
 
 ### M2 · 혼자 짜기

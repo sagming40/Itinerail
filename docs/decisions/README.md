@@ -8,7 +8,8 @@
 
 | 번호 | 결정 | 상태 |
 |---|---|---|
-| [0001](0001-elixir-phoenix-liveview.md) | 스택은 Elixir + Phoenix + LiveView, 생성기 기본값을 뼈대로 | 채택 |
+| [0001](0001-elixir-phoenix-liveview.md) | 스택은 Elixir + Phoenix + LiveView, 생성기 기본값을 뼈대로 | 채택 (명령 묶기는 0005가 대체) |
 | [0002](0002-travel-planner-topic.md) | 만들 것은 같이 짜는 여행 일정 — 국내 + 해외, 추상 동선, 경비 정산 | 채택 |
 | [0003](0003-place-search-providers.md) | 장소 검색은 국내 카카오 · 해외 Photon · 직접 입력, Google Places는 기본에서 뺌 | 채택 |
 | [0004](0004-card-order-by-time.md) | 하루 안의 카드 순서는 시간순 자동, 끌어 옮기기는 다른 날로만 | 채택 |
+| [0005](0005-commands-mix-only.md) | 명령 묶기는 Task 없이 Mix 하나로 — `mix db` · `mix dev` · `mix ci` · `mix deploy` | 채택 |
