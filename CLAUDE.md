@@ -51,9 +51,10 @@ minor-stacks에서 이어 온다. **버전 · 활동 · 지원 여부 · 외부 
 ## 함정 (미리 알아 둘 것)
 
 - **`phx.gen.auth` 해시 기본값이 OS마다 다르다**(Unix bcrypt · Windows pbkdf2, Phoenix 소스). `--hashing-lib argon2`로 못 박는다.
-- **Postgres는 Docker로 따로, 포트를 비켜서**: 이 노트북은 5432에 PostgreSQL 18이 서비스로 돈다. Postgres 18 이미지 볼륨은 `/var/lib/postgresql`(pc-buildcheck · cbt-journal에서 겪음).
+- **Postgres는 Docker로 따로, 포트를 비켜서**: 노트북 · 집 PC 모두 5432에 PostgreSQL 18이 서비스로 돈다. 이 앱은 **5440**(두 기기 모두 빈 것 확인). Postgres 18 이미지 볼륨은 `/var/lib/postgresql`(pc-buildcheck · cbt-journal에서 겪음).
 - **Python은 PATH에 없다**(전역 설정). 스크립트는 node로.
-- **winget으로 깐 Elixir는 PATH에 안 들어간다**(노트북에서 겪음, 2026-11-22) — 설치 프로그램의 PATH 추가 단계(`update_system_path.erl`)가 조용한 설치에서 빠진다. 사용자 PATH에 `C:\Program Files\Elixir\bin`을 직접 넣고 VS Code를 완전히 다시 켠다. 다른 기기에서도 같다.
+- **winget으로 깐 Elixir는 PATH에 안 들어간다**(노트북에서 겪음, 2026-11-22) — 설치 프로그램의 PATH 추가 단계(`update_system_path.erl`)가 조용한 설치에서 빠진다. 사용자 PATH에 `C:\Program Files\Elixir\bin`을 직접 넣고 VS Code를 완전히 다시 켠다. 다른 기기에서도 같다(집 PC 2026-11-23).
+  - **넣을 때는 환경 변수 창 "새로 만들기"로 한 줄만 더한다.** `[Environment]::SetEnvironmentVariable("Path", 옛값 + ";...", "User")`는 옛 값이 빈 문자열로 읽히면 사용자 PATH 전체를 덮어쓴다 — 집 PC에서 Erlang · Go · cargo · npm 줄이 다 사라졌다(2026-11-23, 세션 환경에 남은 옛 PATH로 복구). `"erl.exe" is not recognized`가 뜨면 Elixir가 아니라 Erlang PATH 문제다.
 - **PowerShell에서 `iex`는 `Invoke-Expression`이다** — Elixir 대화형 셸은 `iex.bat`, 앱과 같이 띄울 땐 `iex.bat -S mix phx.server`.
 - **PowerShell `[string].Replace`에 `$null`을 넘기지 않는다** — 실패한 변수가 `[char]`로 바뀌어 `'|'`를 전부 NUL로 바꾼 적이 있다(DEVTOOLS.md, 2026-11-22, 복구함). 파일 고치기는 편집 도구나 node 스크립트 파일로.
 
@@ -70,6 +71,7 @@ minor-stacks에서 이어 온다. **버전 · 활동 · 지원 여부 · 외부 
 | 기기 | 이 폴더 |
 |---|---|
 | 노트북 | `C:\_dev\Itinerail` |
+| 집 PC | `D:\_dev\Itinerail` (Elixir 1.20.5 · Hex 2.7.0, 2026-11-23. phx_new 아카이브는 안 깖 — `phx.new`에만 쓴다) |
 
 다른 기기는 GitHub에 올린 뒤 `git clone`하고 이 표에 줄을 더한다. 도구 현황은 `~/.claude/DEVTOOLS.md`.
 
