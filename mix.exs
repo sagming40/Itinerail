@@ -95,7 +95,15 @@ defmodule Itinerail.MixProject do
         "esbuild itinerail --minify",
         "phx.digest"
       ],
-      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
+      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"],
+      # ── Elixir 밖의 것(Docker)도 여기서 부른다 — decisions 0005 ──
+      # "cmd ..." = mix가 셸에게 대신 시키는 심부름. Python subprocess.run과 비슷하다
+      # --wait: compose.yml의 healthcheck가 통과할 때까지 기다렸다 돌아온다
+      db: ["cmd docker compose up -d --wait"],
+      # 끄기만 한다(down은 컨테이너까지 지움). 데이터는 볼륨에 남는다
+      "db.stop": ["cmd docker compose stop"],
+      # 별칭 안에서 다른 별칭을 부를 수 있다: db 버튼을 먼저 누르고 서버를 띄운다
+      dev: ["db", "phx.server"]
     ]
   end
 end
