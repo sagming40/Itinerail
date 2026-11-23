@@ -70,7 +70,9 @@
 - [x] `mix phx.new . --app itinerail --binary-id`(사용자, 커밋 `eb44fce`, 2026-11-22)
 - [x] 개발 DB(Docker Postgres 18, 포트 5440) · 첫 `mix phx.server`(집 PC, 커밋 `bec8c75`, 2026-11-23)
 - [x] `mix db` · `mix db.stop` · `mix dev` 별칭(decisions 0005 — Taskfile 대신, 커밋 `971136d`, 2026-11-23)
-- [ ] `phx.gen.auth --hashing-lib argon2` · daisyUI 테마(DESIGN 3 ~ 6장) · `mix ci` 별칭 · CI · release 이미지 · `mix deploy` · 배포
+- [x] `phx.gen.auth Accounts User users --live --hashing-lib argon2`(사용자, 커밋 `a473952`, `mix test` 112 passed, 화면 한 바퀴, 2026-11-23)
+- [ ] daisyUI 테마(DESIGN 3 ~ 6장) · 가입 · 로그인 화면을 DESIGN 7.1대로(비밀번호 폼 접기 · 문구)
+- [ ] `mix ci` 별칭(Credo · Sobelow) · CI · release 이미지 · `mix deploy` · 배포
 - **완료 기준**: `mix ci` 통과, CI 초록, **휴대폰(LTE)으로 하위 주소에서 가입 → 매직 링크 로그인**
 
 ### M2 · 혼자 짜기

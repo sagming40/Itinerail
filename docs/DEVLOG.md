@@ -7,11 +7,40 @@
 | 항목 | 내용 |
 |---|---|
 | 단계 | M1 · 뼈대 + 첫 배포 |
-| 진행 중 | 뼈대 생성까지(`mix phx.new`, 커밋 `eb44fce`). 개발 DB는 아직 — 서버를 한 번도 안 띄웠다 |
-| 다음에 할 일 | `compose.yaml`(Postgres 18, 포트 **5440**) · `config/dev.exs` · `test.exs`에 `port: 5440` 타이핑(사용자) → `docker compose up -d` → `mix ecto.create` → `mix phx.server` → 코드 검수 → Taskfile → `phx.gen.auth --hashing-lib argon2` |
-| 기기별로 할 일 | 노트북만 씀. 다른 기기는 `git clone https://github.com/sagming40/Itinerail` |
+| 진행 중 | 개발 DB(5440) · `mix db` / `mix dev` 별칭 · `phx.gen.auth`(argon2 · LiveView)까지. `mix test` 112 passed, 인증 한 바퀴 화면 확인 |
+| 다음에 할 일 | daisyUI 테마(DESIGN 3 ~ 6장)를 입히고 가입 · 로그인 화면을 DESIGN 7.1대로 → `mix ci`(Credo · Sobelow) → CI → release · `mix deploy` |
+| 기기별로 할 일 | **노트북**: `git pull` → `mix deps.get` → VS 개발자 셸(amd64)에서 `mix db` · `mix ecto.migrate` · `mix test`(argon2 NIF 빌드, CLAUDE.md 함정). 집 PC는 끝 |
 
 ---
+
+## 2026-11-23 (1) · 집 PC 세팅 · 개발 DB · Mix 별칭 · phx.gen.auth (집 PC)
+
+### 한 일
+- 집 PC에 저장소(`D:\_dev\Itinerail`) — 사용자가 Elixir 1.20.5(winget) · Hex 2.7.0 설치, `mix deps.get`. phx_new 아카이브는 안 깔았다(`phx.new`에만 쓰고 `phx.gen.*`는 프로젝트 의존성 `phoenix` 안에 있다). Erlang 29.1.2 · Docker 29.8.2는 원래 있었고, 5440이 비어 있음(5432는 PostgreSQL 서비스, 5433 ~ 5438은 다른 프로젝트 compose).
+- 개발 DB(사용자 타이핑): `compose.yml`(postgres:18, `127.0.0.1` · `[::1]`의 5440, 볼륨 `/var/lib/postgresql`, healthcheck) + `dev.exs` · `test.exs`에 `port: 5440`. `docker compose ps` healthy → `mix ecto.create` "The database for Itinerail.Repo has been created". 의존성 컴파일 때 나온 노란 경고(gettext · dns_cluster · `xref: [exclude:]`)는 전부 의존성 쪽 — Elixir 1.20 타입 검사가 잡은 것, 우리 앱은 깨끗.
+- 첫 `mix phx.server`: `localhost:4000` 환영 화면, `home.html.heex`를 고치자 새로고침 없이 바뀜(`Live reload:` 로그) → 되돌림.
+- 명령 묶기를 **Task 대신 Mix 하나로**(사용자 결정, [decisions/0005](decisions/0005-commands-mix-only.md)). 사용자가 Task · just 말고 다른 걸 원했고, mise와 비교해 Mix를 골랐다. `mix.exs` 별칭 `db`(`cmd docker compose up -d --wait`) · `db.stop` · `dev`(`db` → `phx.server`). 확인: `mix help`에 셋, `db.stop` → Stopped, `mix dev` → Healthy 뒤 서버, `mix test` 5 passed.
+- `mix phx.gen.auth Accounts User users --live --hashing-lib argon2`(사용자). argon2_elixir 4.1.3 · comeonin 5.5.1, 스코프 `Itinerail.Accounts.Scope`(`schema_type: :binary_id`), 마이그레이션 citext · `users` · `users_tokens`. 생성기 결과 그대로 따로 커밋. `mix ecto.migrate` 성공, **`mix test` 112 passed**(0.8초 — test만 `t_cost: 1, m_cost: 8`).
+- 화면 한 바퀴: `/users/register` 가입 → `/dev/mailbox` 링크 → "Confirm and stay logged in" → 위 메뉴 `test@example.com` · Settings · Log out → Settings 화면 → 로그아웃 → `/users/settings` 직접 입력 시 `/users/log-in`으로 + "You must log in to access this page." DB에서 사용자 1명 confirmed · 토큰 1개(세션) 확인.
+- 코드 읽기(짧게): `fetch_current_scope_for_user`(세션 · 쿠키 토큰 → `current_scope`) → 라우트 `:require_authenticated_user` → LiveView `on_mount` 이중 검사. 로그인 유지 쿠키 14일, 세션 토큰 7일마다 재발급. Settings의 sudo 모드는 **10분**(`user_auth.ex:237`이 넘김, `Accounts.sudo_mode?/2` 기본값은 20분).
+- `~/.claude/DEVTOOLS.md` 집 PC 절에 Elixir 줄을 더하고, 드라이브 사본(노트북에서 더 새로 고친 쪽)과 맞춰 두 파일이 같음을 `cmp`로 확인.
+
+### [설계]
+- 명령 묶기는 Mix만 — decisions 0005. 0001의 "mix 별칭 + Task"는 상태 줄에 "0005가 대체"로 표시. Docker를 부르는 별칭(`db` · `dev`)은 `test` · `ci`에 넣지 않는다(CI는 서비스 컨테이너).
+- DESIGN 7.1과 다른 점: 생성기 로그인 화면은 비밀번호 폼이 펼쳐져 있다(DESIGN은 접어 둠). 테마 · 화면 단계에서 맞춘다 — 지금은 생성기 그대로.
+
+### 막힌 것
+- **`elixir --version` → `"erl.exe" is not recognized`** — 원인: 사용자 PATH가 Elixir 두 줄로 덮어써져 원래 있던 `Erlang OTP\bin` 등 23줄이 사라졌다. 내가 준 `[Environment]::SetEnvironmentVariable("Path", 옛값 + ";…", "User")`에서 옛 값이 빈 문자열로 읽혔다(이유는 확실히 모름, 시작 `;`로 보아 빈 값). 해결: 이 세션 프로세스가 아직 들고 있던 옛 PATH에서 시스템 PATH 줄을 빼 사용자 PATH 23줄 + Elixir를 되살리는 명령을 사용자가 실행 → `elixir` 1.20.5, 다른 도구도 다시 잡힘. 배운 것: PATH는 환경 변수 창 "새로 만들기"로 한 줄씩. `erl.exe`를 못 찾는다는 건 Elixir가 아니라 Erlang PATH 문제다. CLAUDE.md 함정 · DEVTOOLS에 적음.
+- **argon2 NIF 빌드** — 사전 검증에서 발견: argon2_elixir 4.1.3은 Windows 완성 바이너리가 없고 `Makefile.win`(nmake + cl)로 빌드한다. 일반 PowerShell엔 둘 다 없어 VS 2022 개발자 셸(`Launch-VsDevShell.ps1 -Arch amd64 -HostArch amd64 -SkipAutomaticLocation`)에서 `mix ecto.migrate` · `mix test`를 돌려 dev · test `_build`에 `argon2_nif.dll`을 만들었다(cl 19.44 x64). 처음 한 번에 통과. MSVC 메시지가 CP949라 터미널에서 글자가 깨져 보이지만 오류 아님.
+- **`mix format --check-formatted` 실패** — 원인: 내가 준 `dev.exs`의 줄 끝 주석(`port: 5440, # …`)을 포매터가 윗줄로 옮긴다. 해결: 사용자가 주석을 윗줄로 → 통과. 배운 것: Elixir 코드 예시에 줄 끝 주석을 쓰지 않는다(CLAUDE.md 함정).
+- `mix phx.server`의 symlink 경고 — 개발자 모드가 켜져 있어도(레지스트리 1) 뜬다. Erlang이 비특권 심볼릭 링크 플래그를 안 넘기는 걸로 본다 *(판단)*. 복사로 대신해 리로드가 조금 느린 정도라 둠.
+- Ctrl+C: 한 번 → `BREAK:` 메뉴에서 `a` → `mix.bat` 때문에 `Terminate batch job (Y/N)?`가 한 번 더 나온다. 정상.
+
+### 이번 세션 커밋
+- `bcdc8be` docs: 집 PC · PATH 함정 → `bec8c75` chore: 개발 DB 5440 → `3e7a55b` docs: decisions 0005 → `971136d` chore: mix db · db.stop · dev 별칭 → `879eea4` docs: PLAN 체크 → `a473952` init: phx.gen.auth → `7b2a48d` docs: argon2 · 줄 끝 주석 함정 → `fd2fa53` fix: dev.exs 주석
+
+### 다음에 할 일
+- "현재 상태" 다음에 할 일 · 기기별로 할 일.
 
 ## 2026-11-22 (8) · 뼈대 생성 (노트북)
 
