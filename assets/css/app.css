@@ -18,76 +18,82 @@
   themes: false;
 }
 
-/* daisyUI theme plugin.
-  We ship with two themes, a light one inspired on Phoenix colors and a dark one inspired
-  on Elixir colors. Build your own at: https://daisyui.com/theme-generator/ */
-@plugin "daisyui/packages/bundle/daisyui-theme" {
-  name: "dark";
-  default: false;
-  prefersdark: true;
-  color-scheme: "dark";
-  --color-base-100: oklch(30.33% 0.016 252.42);
-  --color-base-200: oklch(25.26% 0.014 253.1);
-  --color-base-300: oklch(20.15% 0.012 254.09);
-  --color-base-content: oklch(97.807% 0.029 256.847);
-  --color-primary: oklch(58% 0.233 277.117);
-  --color-primary-content: oklch(96% 0.018 272.314);
-  --color-secondary: oklch(58% 0.233 277.117);
-  --color-secondary-content: oklch(96% 0.018 272.314);
-  --color-accent: oklch(60% 0.25 292.717);
-  --color-accent-content: oklch(96% 0.016 293.756);
-  --color-neutral: oklch(37% 0.044 257.287);
-  --color-neutral-content: oklch(98% 0.003 247.858);
-  --color-info: oklch(58% 0.158 241.966);
-  --color-info-content: oklch(97% 0.013 236.62);
-  --color-success: oklch(60% 0.118 184.704);
-  --color-success-content: oklch(98% 0.014 180.72);
-  --color-warning: oklch(66% 0.179 58.318);
-  --color-warning-content: oklch(98% 0.022 95.277);
-  --color-error: oklch(58% 0.253 17.585);
-  --color-error-content: oklch(96% 0.015 12.422);
-  --radius-selector: 0.25rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.5rem;
-  --size-selector: 0.21875rem;
-  --size-field: 0.21875rem;
-  --border: 1.5px;
-  --depth: 1;
-  --noise: 0;
-}
-
+/* 우리 테마 — 값은 docs/DESIGN.md 3장(색) · 5장(모양).
+   부품(btn · card · input)은 이 변수 이름만 보고 색을 칠한다. 도색만 바꾸는 셈. */
 @plugin "daisyui/packages/bundle/daisyui-theme" {
   name: "light";
   default: true;
   prefersdark: false;
   color-scheme: "light";
-  --color-base-100: oklch(98% 0 0);
-  --color-base-200: oklch(96% 0.001 286.375);
-  --color-base-300: oklch(92% 0.004 286.32);
-  --color-base-content: oklch(21% 0.006 285.885);
-  --color-primary: oklch(70% 0.213 47.604);
-  --color-primary-content: oklch(98% 0.016 73.684);
-  --color-secondary: oklch(55% 0.027 264.364);
-  --color-secondary-content: oklch(98% 0.002 247.839);
-  --color-accent: oklch(0% 0 0);
-  --color-accent-content: oklch(100% 0 0);
-  --color-neutral: oklch(44% 0.017 285.786);
-  --color-neutral-content: oklch(98% 0 0);
-  --color-info: oklch(62% 0.214 259.815);
-  --color-info-content: oklch(97% 0.014 254.604);
-  --color-success: oklch(70% 0.14 182.503);
-  --color-success-content: oklch(98% 0.014 180.72);
-  --color-warning: oklch(66% 0.179 58.318);
-  --color-warning-content: oklch(98% 0.022 95.277);
-  --color-error: oklch(58% 0.253 17.585);
-  --color-error-content: oklch(96% 0.015 12.422);
-  --radius-selector: 0.25rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.5rem;
-  --size-selector: 0.21875rem;
-  --size-field: 0.21875rem;
-  --border: 1.5px;
-  --depth: 1;
+  /* base-100 = card, base-200 = bg(바탕), base-300 = chip */
+  --color-base-100: #ffffff;
+  --color-base-200: #f2f0eb;
+  --color-base-300: #e5e2da;
+  --color-base-content: #23262d;
+  /* 주 버튼 = 기차색 */
+  --color-primary: #2f3a44;
+  --color-primary-content: #ffffff;
+  /* 보조 버튼 = chip 바탕 + 본문 글자 */
+  --color-secondary: #e5e2da;
+  --color-secondary-content: #23262d;
+  /* accent · info · warning은 날짜 색 ink에서 빌림(노을 · 하늘 · 모래) */
+  --color-accent: #d63c12;
+  --color-accent-content: #ffffff;
+  --color-neutral: #2f3a44;
+  --color-neutral-content: #ffffff;
+  --color-info: #3074ca;
+  --color-info-content: #ffffff;
+  --color-success: #2e7d4f;
+  --color-success-content: #ffffff;
+  --color-warning: #9c6b14;
+  --color-warning-content: #ffffff;
+  --color-error: #b4381f;
+  --color-error-content: #ffffff;
+  /* 칩 999px · 버튼과 입력 10px · 카드 14px */
+  --radius-selector: 999px;
+  --radius-field: 10px;
+  --radius-box: 14px;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  /* 입체감 · 종이 결 끔 — 그림자는 한 단계만 */
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/packages/bundle/daisyui-theme" {
+  name: "dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: "dark";
+  --color-base-100: #1e232b;
+  --color-base-200: #14171d;
+  --color-base-300: #2a303a;
+  --color-base-content: #eceef2;
+  /* 다크에선 기차색이 바탕에 묻혀서 주 버튼을 밝게 뒤집는다(목업 Auth.html) */
+  --color-primary: #eceef2;
+  --color-primary-content: #14171d;
+  --color-secondary: #2a303a;
+  --color-secondary-content: #eceef2;
+  --color-accent: #f0714f;
+  --color-accent-content: #14171d;
+  --color-neutral: #0b0d11;
+  --color-neutral-content: #eceef2;
+  --color-info: #3074ca;
+  --color-info-content: #ffffff;
+  --color-success: #6fd39a;
+  --color-success-content: #14171d;
+  --color-warning: #9c6b14;
+  --color-warning-content: #ffffff;
+  --color-error: #ff8f78;
+  --color-error-content: #14171d;
+  --radius-selector: 999px;
+  --radius-field: 10px;
+  --radius-box: 14px;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
   --noise: 0;
 }
 
@@ -103,3 +109,49 @@
 [data-phx-session], [data-phx-teleported-src] { display: contents }
 
 /* This file is for your main application CSS */
+
+/* daisyUI에 자리가 없는 우리 색.
+   라이트를 먼저, 다크를 나중에 써야 한다 — 우선순위가 같아서 뒤에 쓴 쪽이 이긴다. */
+:root,
+[data-theme="light"] {
+  --it-muted: #656a75;
+  --it-line-soft: #dcd8ce;
+  --it-train-2: #3a4652;
+}
+
+[data-theme="dark"] {
+  --it-muted: #9aa0ad;
+  --it-line-soft: #2c323c;
+  --it-train-2: #1a1f27;
+}
+
+/* 변수를 Tailwind 클래스로: text-muted · border-line-soft · bg-train · bg-train-2 */
+@theme inline {
+  --color-muted: var(--it-muted);
+  --color-line-soft: var(--it-line-soft);
+  --color-train: var(--color-neutral);
+  --color-train-2: var(--it-train-2);
+}
+
+/* 글꼴 이름만 먼저. 파일은 다음 단계에서 받는다 — 그 전엔 시스템 한글 글꼴로 보인다 */
+@theme {
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+}
+
+/* 페이지 바탕은 bg(base-200). daisyUI 기본은 base-100이라 덮는다 */
+html {
+  background-color: var(--color-base-200);
+}
+
+/* "동작 줄이기"를 켠 사람에게는 움직임을 전부 멈춘다(DESIGN 6장) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
