@@ -5,7 +5,8 @@ config :itinerail, Itinerail.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  port: 5440,                 # 5432는 PC에 직접 깐 Postgres 자리. Docker 쪽 문 번호
+  # 5432는 PC에 직접 깐 Postgres 자리. Docker 쪽 문 번호
+  port: 5440,
   database: "itinerail_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
