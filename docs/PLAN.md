@@ -71,7 +71,8 @@
 - [x] 개발 DB(Docker Postgres 18, 포트 5440) · 첫 `mix phx.server`(집 PC, 커밋 `bec8c75`, 2026-11-23)
 - [x] `mix db` · `mix db.stop` · `mix dev` 별칭(decisions 0005 — Taskfile 대신, 커밋 `971136d`, 2026-11-23)
 - [x] `phx.gen.auth Accounts User users --live --hashing-lib argon2`(사용자, 커밋 `a473952`, `mix test` 112 passed, 화면 한 바퀴, 2026-11-23)
-- [ ] daisyUI 테마(DESIGN 3 ~ 6장) · 가입 · 로그인 화면을 DESIGN 7.1대로(비밀번호 폼 접기 · 문구)
+- [x] daisyUI 테마(DESIGN 3 · 5 · 6장) · Pretendard 동적 서브셋(DESIGN 4장)(사용자 타이핑, 커밋 `11f03bc` · `9d86637` · `f8cfbbc`, 2026-11-23)
+- [ ] 🔄 가입 · 로그인 화면을 DESIGN 7.1대로(비밀번호 폼 접기 · 문구) — 6조각 중 ① 풍경 창문 컴포넌트(`8a7ddb9`, 2026-11-23)까지, 조각 표는 DEVLOG 2026-11-23 (2)
 - [ ] `mix ci` 별칭(Credo · Sobelow) · CI · release 이미지 · `mix deploy` · 배포
 - **완료 기준**: `mix ci` 통과, CI 초록, **휴대폰(LTE)으로 하위 주소에서 가입 → 매직 링크 로그인**
 

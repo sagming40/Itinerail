@@ -7,9 +7,41 @@
 | 항목 | 내용 |
 |---|---|
 | 단계 | M1 · 뼈대 + 첫 배포 |
-| 진행 중 | 개발 DB(5440) · `mix db` / `mix dev` 별칭 · `phx.gen.auth`(argon2 · LiveView)까지. `mix test` 112 passed, 인증 한 바퀴 화면 확인 |
-| 다음에 할 일 | daisyUI 테마(DESIGN 3 ~ 6장)를 입히고 가입 · 로그인 화면을 DESIGN 7.1대로 → `mix ci`(Credo · Sobelow) → CI → release · `mix deploy` |
-| 기기별로 할 일 | **노트북**: `git pull` → `mix deps.get` → VS 개발자 셸(amd64)에서 `mix db` · `mix ecto.migrate` · `mix test`(argon2 NIF 빌드, CLAUDE.md 함정). 집 PC는 끝 |
+| 진행 중 | 가입 · 로그인 화면을 DESIGN 7.1대로 — 6조각 중 1번(풍경 창문 컴포넌트)까지. 테마 · Pretendard는 끝 |
+| 다음에 할 일 | 2번 레이아웃(`Layouts.app` 정리 · 새 `Layouts.auth`) → 3 알림 → 4 로그인 → 5 가입 · 확인 → 6 테스트 · 화면 (조각 표는 2026-11-23 (2)) → `mix ci` → CI → 배포 |
+| 기기별로 할 일 | **집 PC**: `git pull` 뒤 VS Code에 ElixirLS를 깔았으면 VS 개발자 셸에서 `code .`로 한 번 열기(CLAUDE.md 함정). 노트북은 끝 |
+
+---
+
+## 2026-11-23 (2) · 노트북 세팅 · daisyUI 테마 · Pretendard · 풍경 창문 (노트북)
+
+### 한 일
+- 노트북 따라잡기(사용자): Docker Desktop 켬 → `mix deps.get`(argon2_elixir 4.1.3 · comeonin 5.5.1) → VS 개발자 셸(amd64)에서 `mix db` · `mix ecto.create` · `mix ecto.migrate` · `mix test` → **112 passed**(3.0초). `_build/dev` · `_build/test` 둘 다 `argon2_nif.dll` 생김.
+- **daisyUI 테마**(사용자 타이핑, 커밋 `11f03bc`): 생성기 기본 테마 두 벌을 DESIGN 값으로 덮음. base-100 = `card`, base-200 = `bg`, base-300 = `chip`, primary = 기차색(다크는 `fg`로 뒤집음 — 목업 Auth.html), secondary = chip 바탕(보조 버튼), 모서리 필드 10px · 박스 14px · 선택 999px, depth · noise 0. daisyUI에 자리가 없는 `muted` · `line-soft` · `train` · `train-2`는 `@theme inline`으로 클래스를 만듦. 페이지 바탕 base-200, `prefers-reduced-motion`이면 움직임 멈춤. 확인(브라우저 계산값, `/users/log-in`): 라이트 바탕 `#f2f0eb` · 주 버튼 `#2f3a44`/흰 글자 · 입력 `#ffffff`, 다크 바탕 `#14171d` · 주 버튼 `#eceef2`/`#14171d` · 입력 `#1e232b`, 버튼 · 입력 모서리 10px.
+- **Pretendard**(커밋 `9d86637` · `f8cfbbc`): 1.3.9 가변 글꼴 동적 서브셋(92조각, 2,957,724바이트) + OFL `LICENSE.txt`를 `priv/static/fonts/pretendard/`에(사용자). `root.html.heex`에 `<link>` 한 줄(app.css보다 먼저, `phx-track-static` 없음) + `lang="ko"`(사용자 타이핑). 확인: CSS 200 · 조각 200 `font/woff2`, `@font-face` 92개 중 로그인 화면에서 **2조각만**(약 65KB) 받음, `document.fonts.check("Pretendard Variable")` true.
+- 가입 · 로그인 화면(7.1)을 6조각으로 나눔: ① 풍경 창문 컴포넌트 ② 레이아웃(root 위 메뉴를 `Layouts.app`으로, Phoenix 머리말 → Itinerail 이름 + 테마 토글 + 사용자 메뉴, 제목 꼬리 제거, 새 `Layouts.auth` — 모바일 창문 위 · PC 왼쪽 기차 패널) ③ 알림(카드 + 6px 띠 + 아이콘 + 굵은 첫 줄, 문구 한국어) ④ 로그인(매직 링크 기본 · 비밀번호 `<details>` 접기 · 개발 안내 · 재인증 문구) ⑤ 가입 · 확인 + 메일 형식 오류 문구 ⑥ 테스트 문구 · `mix test` · 라이트 · 다크 · 모바일 · PC.
+- ① **풍경 창문**(사용자 타이핑, 커밋 `8a7ddb9`): `ItinerailWeb.Scenery.train_window/1` — 풍경 6개를 SVG로, 먼 층 · 가까운 층을 두 장(0 · 390) 이어 붙여 46초 · 16초에 흘림, 유리 반사 .26 · .1(DESIGN 5장 값 — 목업은 .28 · .12), "창밖 · 이름" 꼬리표. 확인: 풍경 6개를 테스트 환경에서 렌더링해 하늘 · 해 · 땅 색과 경로 · 이름이 DESIGN 3장과 같음, `--warnings-as-errors` 경고 0, `mix format` 통과. 아직 화면에서 부르지 않음(②에서).
+- VS Code에 Elixir 확장이 없어 `.ex`가 Plain Text로 보였다 → ElixirLS(`JakeBecker.elixir-ls` 0.31.1) 설치(사용자). Expert(공식 LSP)는 README에 alpha, VS Code 확장은 소스에서 빌드해야 해서 뺌(GitHub에서 확인).
+
+### [설계]
+- 화면 글자는 Gettext 없이 템플릿에 한국어로 바로 쓴다 *(판단 — 한국어 하나뿐, 다국어가 필요해지면 옮긴다)*.
+- 7.1에서 이번에 안 하는 것 *(판단)*: "링크 보냄" 전용 화면은 로그인 화면 위 알림으로, "메일 앱 열기" 버튼은 뺌(공통 링크가 없음), 초대 카드는 M3, 설정 화면 · 메일 본문 한국어는 M2 앱 틀에서.
+- 비밀번호가 틀려 돌아오면 `<details open>` — 컨트롤러가 그 경우에만 `:email` flash를 넣는 걸 신호로 쓴다(사전 검증에서 발견: 접힌 채면 오류 알림만 있고 입력칸이 안 보인다).
+- 풍경 모양 · 색의 원본은 이제 `scenery.ex`(DESIGN 3장 문장도 고침). 글꼴 받는 방법도 정해져 DESIGN 4장 문장을 고침.
+- accent · info · warning은 DESIGN에 없어 날짜 색 `ink`(노을 · 하늘 · 모래)에서 빌림. `radius-selector` 999px라 체크박스가 동그래지는 건 감수.
+
+### 막힌 것
+- **동적 서브셋이 zip에 없음** — 증상: GitHub 릴리스 `Pretendard-1.3.9.zip`을 풀어 보니 `web/variable/`에 통파일(`PretendardVariable.woff2` 2MB)뿐. 원인: 서브셋은 저장소 `dist`와 npm 패키지에만 있다(zip 목록 · 저장소 트리로 확인). 해결: `npm pack pretendard@1.3.9` → `tar -xzf` → `package/dist/web/variable/`에서 복사. 배운 것: 배포물 안에 무엇이 있는지는 저장소 트리 말고 받을 파일 목록으로 확인한다.
+- **`mix dev`가 바로 꺼짐** — 원인: 내가 준 `Set-Location`으로 터미널이 다운로드 폴더에 남아 `mix.exs`가 없었다. 해결: `Set-Location C:\_dev\Itinerail`. 배운 것: 폴더를 옮기는 명령을 주면 돌아오는 명령도 같이 준다.
+- **ElixirLS `"nmake" not found`**(`mix.exs`에 빨간 줄) — 원인: ElixirLS는 `.elixir_ls/build`에 의존성을 따로 컴파일해서 argon2 NIF를 다시 빌드해야 하는데, 일반으로 켠 VS Code엔 MSVC가 없다. 해결: VS Code를 완전히 닫고 VS 개발자 셸(amd64)에서 `code C:\_dev\Itinerail` → Problems 0. CLAUDE.md 함정에 적음(`7cb7353`).
+- `mix format --check-formatted` 실패(`scenery.ex` 바다 `far:` 줄이 98자 넘음) — 내가 준 코드에서 그 줄만 줄바꿈을 빠뜨림. `mix format`으로 해결.
+- 테마 확인 중 라이트로 바꿔도 버튼이 다크 색으로 읽힘 — 버튼의 0.2초 색 전환이 숨은 브라우저 창에서 진행되지 않아서였다. 전환을 끄고 읽으니 맞음. 테마 문제 아님.
+
+### 이번 세션 커밋
+- `11f03bc` feat: daisyUI 테마 → `9d86637` chore: Pretendard 동적 서브셋 → `f8cfbbc` feat: Pretendard 연결 · lang ko → `8a7ddb9` feat: 풍경 창문 컴포넌트 → `7cb7353` docs: ElixirLS argon2 함정
+
+### 다음에 할 일
+- "현재 상태" 다음에 할 일.
 
 ---
 
