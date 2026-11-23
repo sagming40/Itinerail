@@ -69,7 +69,7 @@
 - [x] Elixir 1.20.5 · Hex · phx_new 1.8.17 설치(사용자, 2026-11-22)
 - [x] `mix phx.new . --app itinerail --binary-id`(사용자, 커밋 `eb44fce`, 2026-11-22)
 - [x] 개발 DB(Docker Postgres 18, 포트 5440) · 첫 `mix phx.server`(집 PC, 커밋 `bec8c75`, 2026-11-23)
-- [ ] `mix db` · `mix dev` 별칭(decisions 0005 — Taskfile 대신)
+- [x] `mix db` · `mix db.stop` · `mix dev` 별칭(decisions 0005 — Taskfile 대신, 커밋 `971136d`, 2026-11-23)
 - [ ] `phx.gen.auth --hashing-lib argon2` · daisyUI 테마(DESIGN 3 ~ 6장) · `mix ci` 별칭 · CI · release 이미지 · `mix deploy` · 배포
 - **완료 기준**: `mix ci` 통과, CI 초록, **휴대폰(LTE)으로 하위 주소에서 가입 → 매직 링크 로그인**
 
