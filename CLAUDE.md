@@ -55,6 +55,8 @@ minor-stacks에서 이어 온다. **버전 · 활동 · 지원 여부 · 외부 
 - **Python은 PATH에 없다**(전역 설정). 스크립트는 node로.
 - **winget으로 깐 Elixir는 PATH에 안 들어간다**(노트북에서 겪음, 2026-11-22) — 설치 프로그램의 PATH 추가 단계(`update_system_path.erl`)가 조용한 설치에서 빠진다. 사용자 PATH에 `C:\Program Files\Elixir\bin`을 직접 넣고 VS Code를 완전히 다시 켠다. 다른 기기에서도 같다(집 PC 2026-11-23).
   - **넣을 때는 환경 변수 창 "새로 만들기"로 한 줄만 더한다.** `[Environment]::SetEnvironmentVariable("Path", 옛값 + ";...", "User")`는 옛 값이 빈 문자열로 읽히면 사용자 PATH 전체를 덮어쓴다 — 집 PC에서 Erlang · Go · cargo · npm 줄이 다 사라졌다(2026-11-23, 세션 환경에 남은 옛 PATH로 복구). `"erl.exe" is not recognized`가 뜨면 Elixir가 아니라 Erlang PATH 문제다.
+- **argon2_elixir는 Windows에서 받은 쪽이 C로 빌드한다**(완성 바이너리 없음, `Makefile.win` → `nmake` + `cl`). 일반 PowerShell엔 둘 다 없어서, 새 기기 · `_build`를 지운 뒤에는 VS 개발자 셸에서 한 번 컴파일한다: `& "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\Launch-VsDevShell.ps1" -Arch amd64 -HostArch amd64 -SkipAutomaticLocation` → `mix ecto.migrate` · `mix test`(dev · test `_build`가 따로). `-Arch amd64`를 빼면 32비트 컴파일러라 64비트 Erlang이 dll을 못 읽는다. 빌드된 dll은 `_build`에 남아 그다음부터는 일반 터미널로 된다(집 PC 2026-11-23). Docker · CI(Linux)는 해당 없음.
+- **줄 끝 주석은 `mix format`이 윗줄로 옮긴다** — `port: 5440, # 설명`처럼 쓰면 `--check-formatted`가 실패한다. 주석은 처음부터 그 줄 위에 쓴다(2026-11-23 `dev.exs`에서 겪음).
 - **PowerShell에서 `iex`는 `Invoke-Expression`이다** — Elixir 대화형 셸은 `iex.bat`, 앱과 같이 띄울 땐 `iex.bat -S mix phx.server`.
 - **PowerShell `[string].Replace`에 `$null`을 넘기지 않는다** — 실패한 변수가 `[char]`로 바뀌어 `'|'`를 전부 NUL로 바꾼 적이 있다(DEVTOOLS.md, 2026-11-22, 복구함). 파일 고치기는 편집 도구나 node 스크립트 파일로.
 
