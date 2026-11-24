@@ -4,6 +4,7 @@ defmodule ItinerailWeb.Layouts do
   used by your application.
   """
   use ItinerailWeb, :html
+  alias ItinerailWeb.Scenery
 
   # Embed all files in layouts/* within this module.
   # The default root.html.heex file contains the HTML
@@ -66,6 +67,69 @@ defmodule ItinerailWeb.Layouts do
     </main>
 
     <.flash_group flash={@flash} />
+    """
+  end
+
+  @doc """
+  가입 · 로그인 화면 틀(DESIGN 7.1).
+
+  모바일은 창문이 위, PC는 왼쪽에 기차 옆면 패널이 선다.
+
+      <Layouts.auth flash={@flash} scene={:sea}>
+        <h1>어디로 떠나 볼까요?</h1>
+      </Layouts.auth>
+  """
+  attr :flash, :map, required: true, doc: "the map of flash messages"
+  attr :scene, :atom, default: :sea, doc: "창밖 풍경 — 화면마다 다르게"
+  slot :inner_block, required: true
+
+  def auth(assigns) do
+    ~H"""
+    <%!-- PC에서만 두 칸(1.35 : 1). 모바일은 그냥 위에서 아래로 --%>
+    <div class="min-h-dvh lg:grid lg:grid-cols-[1.35fr_1fr]">
+      <%!-- PC 왼쪽: 기차 옆면. 모바일에선 숨긴다 --%>
+      <aside class="hidden lg:flex flex-col gap-[18px] bg-train p-7">
+        <Scenery.train_window id="auth-window-pc" scene={@scene} class="big flex-1">
+          <.brand />
+        </Scenery.train_window>
+        <div class="rail"></div>
+        <p class="text-white">
+          <b class="block text-3xl leading-tight tracking-tight">다음 여행, 같이 짜요</b>
+          <span class="text-[15px] text-white/70">
+            창밖으로 지나가는 풍경처럼 일정도 함께 흘러가요.
+          </span>
+        </p>
+      </aside>
+
+      <div class="flex flex-col lg:items-center lg:justify-center lg:p-10">
+        <%!-- 모바일 위쪽 창문. PC에선 숨긴다 --%>
+        <Scenery.train_window
+          id="auth-window"
+          scene={@scene}
+          class="mx-3.5 mt-3.5 h-[236px] shrink-0 lg:hidden"
+        >
+          <.brand />
+        </Scenery.train_window>
+
+        <%!-- 테스트가 "main a"로 링크를 찾으니 본문은 main 안에 둔다 --%>
+        <main class="flex w-full flex-col gap-3.5 px-[22px] pt-6 pb-7 lg:w-[380px] lg:p-0">
+          {render_slot(@inner_block)}
+        </main>
+
+        <div class="mt-auto flex justify-center pb-5 lg:mt-8 lg:pb-0">
+          <.theme_toggle />
+        </div>
+      </div>
+    </div>
+
+    <.flash_group flash={@flash} />
+    """
+  end
+
+  # 창문 왼쪽 위 앱 이름. 누르면 홈으로.
+  defp brand(assigns) do
+    ~H"""
+    <.link href={~p"/"} class="brand"><i></i>Itinerail</.link>
     """
   end
 
