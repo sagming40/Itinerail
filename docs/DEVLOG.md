@@ -7,11 +7,35 @@
 | 항목 | 내용 |
 |---|---|
 | 단계 | M1 · 뼈대 + 첫 배포 |
-| 진행 중 | 가입 · 로그인 화면을 DESIGN 7.1대로 — 6조각 중 ③ 알림까지(`4e7e4f2`). 테마 · Pretendard는 끝 |
-| 다음에 할 일 | ④ 로그인 → ⑤ 가입 · 확인 → ⑥ 테스트 · 화면 (조각 표는 2026-11-23 (2)) → `mix ci` → CI → 배포 |
-| 기기별로 할 일 | **노트북 · 회사 PC**: PowerShell 프로필에 `itin` 함수(경로 `C:\_dev\Itinerail`)를 넣고 VS Code는 늘 `itin`으로 연다(CLAUDE.md 함정). 집 PC는 끝 |
+| 진행 중 | 가입 · 로그인 화면을 DESIGN 7.1대로 — 6조각 중 ③ 알림까지(`4e7e4f2`). 다음 ④는 둘로 나눔(④-1 로그인 화면 · ④-2 컨트롤러 · 인증 알림 문구) |
+| 다음에 할 일 | ④-1 로그인(설계는 2026-11-24 (1) [설계]) → ④-2 → ⑤ 가입 · 확인 → ⑥ 테스트 · 화면 → `mix ci` → CI → 배포 |
+| 기기별로 할 일 | **노트북 · 회사 PC**: `git pull` → PowerShell 프로필에 `itin` 함수(경로 `C:\_dev\Itinerail`) → VS Code는 늘 `itin`으로(CLAUDE.md 함정). 집 PC는 끝 |
 
 ---
+
+## 2026-11-24 (1) · ③ 알림 · VS Code 여는 방법 · Tailwind 표기 (집 PC)
+
+### 한 일
+- 집 PC VS Code에 ElixirLS(`JakeBecker.elixir-ls` 0.31.1 — CHANGELOG에 Elixir 1.20 · OTP 29 지원) · Phoenix(`phoenixframework.phoenix` 0.1.3, HEEx 문법) 설치(사용자). Expert(공식 LSP)는 README가 alpha(v0.2.4)라 보류. 자동 완성 확인(사용자).
+- 이 세션 시작 때 하루 전 DEVLOG를 읽어 "테마 하자"로 출발했는데, 노트북 · 회사 PC에서 테마 · 글꼴 · 창문 · ②까지 이미 끝나 있었다 → `git log`로 확인하고 ③부터. 회사 PC의 ② 커밋(`b4b681b` 위 메뉴를 `Layouts.app`으로 · 홈 임시 화면, `aa4a59a` `Layouts.auth` · 큰 창문 · 선로)은 DEVLOG 블록이 없어 여기에 남긴다(각 커밋 본문에 확인값 있음).
+- **③ 알림**(사용자 타이핑, `4e7e4f2`): `flash`를 카드 + 왼쪽 6px 띠(info=success · error=error) + 38px 아이콘 받침 + 굵은 첫 줄로. `"제목\n본문"`이면 첫 줄만 굵게(`split_flash` — `String.split(…, parts: 2)` + `case`). 연결 끊김 알림 두 개는 사용자 문구(이모지 제목 · "다시 연결하는 중이에요...")로. `Layouts.auth` 오른쪽 칸 `min-h-dvh` → 모바일 테마 토글이 바닥으로(②에서 남긴 것). 확인: `mix test` 112 passed, 포맷 · 경고 0, 브라우저 `/users/settings` 비로그인 → 오류 알림 다크 카드 `#1e232b` · 띠 `#ff8f78`, 라이트 `#fff` · `#b4381f`, 모서리 14px, 첫 줄 700.
+- **Tailwind 짧은 표기**(사용자, `b5548fa`): 확장의 `suggestCanonicalClasses` 경고 8개 — `gap-[18px]`→`gap-4.5`, `h-[236px]`→`h-59`, `px-[22px]`→`px-5.5`, `lg:w-[380px]`→`lg:w-95`(v4 간격은 4px 배수), 토글 `border-1`→`border`, `[[data-theme=…]_&]:`→`in-data-[theme=…]:`, `!left-0`→`left-0!`. 확인: Problems 0, 112 passed, 컴파일 CSS `h-59 = calc(var(--spacing) * 59)`, 토글 시스템 · 라이트 · 다크 → 동그라미 left 2 · 34 · 66px. `Layouts.auth`는 아직 어느 화면도 안 불러 화면 모양은 ④에서 처음 본다.
+- **VS Code 여는 방법**(사용자 결정, `cdeb959`): 프로필 함수 `itin`(VS 개발자 셸 amd64 → `code 저장소`). 집 PC 프로필에 넣고 실행 확인(사용자).
+
+### [설계]
+- ④를 둘로: **④-1** `login.ex`를 `Layouts.auth`(scene `:sea`)로 — 제목 "어디로 떠나 볼까요?" · 부제, 재확인(`@current_scope` 있음)이면 "한 번 더 확인할게요" / "계정 설정을 바꾸려면 다시 로그인해 주세요.", 매직 링크 폼(라벨 "메일 주소", 버튼 "로그인 링크 받기 →", `phx-disable-with="보내는 중…"`) → `divider` "또는" → 비밀번호는 `<details id="password-login" open={@password_open} phx-mounted={JS.ignore_attributes(["open"])}>`(사용자가 펼친 걸 LiveView 다시 그리기가 접지 않게. LiveView 1.2.15 `js.ex`에서 확인), 버튼 "로그인 유지 →"(primary) · "이번만 로그인"(secondary), 아래 "처음이에요 · 가입하기", 개발 환경 한 줄("/dev/mailbox"). `mount`에서 `password_open = Phoenix.Flash.get(flash, :email) != nil`. 매직 링크 알림 "메일함을 확인해 주세요\n가입된 메일 주소라면 …15분 동안 한 번만…". 테스트: 문구 8곳 + 새 테스트 2개(처음엔 접힘 / 비밀번호 틀린 뒤 `live(recycle(conn), …)`에서 `#password-login[open]` — recycle로 flash가 넘어가는지는 아직 안 돌려 봄). **④-2** 컨트롤러 · `user_auth.ex` 알림 문구와 그 테스트.
+- ④-1 코드는 집 PC 세션에서 보여 주기만 했다(타이핑 전). 다른 기기에서는 위 설계로 다시 보여 달라고 하면 된다.
+
+### 막힌 것
+- **ElixirLS `"nmake" not found` + 칠 때마다 "Formatter plugin Phoenix.LiveView.HTMLFormatter is not loaded"** — 원인: argon2 `Makefile.win`이 빌드 때마다 `priv`를 지우고 새로 만들어서, ElixirLS가 의존성을 다시 컴파일하면 또 `nmake`를 찾는다. 프로젝트 컴파일이 실패하니 HEEx 포매터 플러그인도 못 불러온다. 해결: VS Code를 모두 닫고 VS 개발자 셸(amd64)에서 다시 엶 → Problems 0. 배운 것: "한 번 열면 끝"이 아니다 → 늘 `itin`으로(CLAUDE.md 함정 고침). 앞서 "ElixirLS가 개발자 셸 없이 빌드했다"고 말한 건 틀림 — 사용자가 DEVLOG대로 개발자 셸에서 연 뒤였다.
+- **`mix test` 31개 실패 `Phoenix.HTML.Safe not implemented for Tuple`** — 원인: `class={{…}}`로 쳐서 튜플이 됐다(`class`는 리스트 `[…]`여야 `false`를 빼고 이어 준다). 해결: 대괄호로 → 112 passed.
+- 첫 `mix test`의 `connection refused (localhost:5440)` — DB 컨테이너가 꺼져 있었다. `mix test` 별칭은 DB를 켜지 않으니 먼저 `mix db`/`mix dev`. `mix dev`가 매번 `Recreate`로 컨테이너를 다시 만든다(데이터는 볼륨에 남음) — 이유는 아직 안 봄.
+
+### 이번 세션 커밋
+- `4e7e4f2` feat: 알림 DESIGN 7.1 · 모바일 토글 → `cdeb959` docs: itin 프로필 함수 → `b5548fa` refactor: Tailwind 짧은 표기
+
+### 다음에 할 일
+- "현재 상태" 다음에 할 일 · 기기별로 할 일.
 
 ## 2026-11-23 (2) · 노트북 세팅 · daisyUI 테마 · Pretendard · 풍경 창문 (노트북)
 

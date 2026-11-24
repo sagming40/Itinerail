@@ -72,7 +72,7 @@
 - [x] `mix db` · `mix db.stop` · `mix dev` 별칭(decisions 0005 — Taskfile 대신, 커밋 `971136d`, 2026-11-23)
 - [x] `phx.gen.auth Accounts User users --live --hashing-lib argon2`(사용자, 커밋 `a473952`, `mix test` 112 passed, 화면 한 바퀴, 2026-11-23)
 - [x] daisyUI 테마(DESIGN 3 · 5 · 6장) · Pretendard 동적 서브셋(DESIGN 4장)(사용자 타이핑, 커밋 `11f03bc` · `9d86637` · `f8cfbbc`, 2026-11-23)
-- [ ] 🔄 가입 · 로그인 화면을 DESIGN 7.1대로(비밀번호 폼 접기 · 문구) — 6조각 중 ① 풍경 창문 컴포넌트(`8a7ddb9`, 2026-11-23)까지, 조각 표는 DEVLOG 2026-11-23 (2)
+- [ ] 🔄 가입 · 로그인 화면을 DESIGN 7.1대로(비밀번호 폼 접기 · 문구) — 6조각 중 ① 풍경 창문(`8a7ddb9`, 2026-11-23) · ② 레이아웃(`b4b681b` · `aa4a59a`, 회사 PC 2026-11-24) · ③ 알림(`4e7e4f2`, 집 PC 2026-11-24)까지, 조각 표는 DEVLOG 2026-11-23 (2) · ④ 설계는 2026-11-24 (1)
 - [ ] `mix ci` 별칭(Credo · Sobelow) · CI · release 이미지 · `mix deploy` · 배포
 - **완료 기준**: `mix ci` 통과, CI 초록, **휴대폰(LTE)으로 하위 주소에서 가입 → 매직 링크 로그인**
 
