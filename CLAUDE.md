@@ -72,13 +72,23 @@ minor-stacks에서 이어 온다. **버전 · 활동 · 지원 여부 · 외부 
 
 ## 기기
 
-| 기기 | 이 폴더 |
-|---|---|
-| 노트북 | `C:\_dev\Itinerail` |
-| 집 PC | `D:\_dev\Itinerail` (Elixir 1.20.5 · Hex 2.7.0, 2026-11-23. phx_new 아카이브는 안 깖 — `phx.new`에만 쓴다) |
-| 회사 PC | `C:\_dev\Itinerail` (Elixir 1.20.5 · Hex 2.7.0, 2026-11-24. phx_new 아카이브는 안 깖. DB 5440, `mix test` 112 passed) |
+| 기기 | 이 폴더 | `itin` 함수 |
+|---|---|---|
+| 노트북 | `C:\_dev\Itinerail` | ⬜ 아직 |
+| 집 PC | `D:\_dev\Itinerail` (Elixir 1.20.5 · Hex 2.7.0, 2026-11-23. phx_new 아카이브는 안 깖 — `phx.new`에만 쓴다) | ✅ 2026-11-24 |
+| 회사 PC | `C:\_dev\Itinerail` (Elixir 1.20.5 · Hex 2.7.0, 2026-11-24. phx_new 아카이브는 안 깖. DB 5440, `mix test` 112 passed) | ⬜ 아직 |
 
 다른 기기는 GitHub에 올린 뒤 `git clone`하고 이 표에 줄을 더한다. 도구 현황은 `~/.claude/DEVTOOLS.md`.
+
+**VS Code는 `itin`으로 연다** (argon2 · ElixirLS 때문, 위 "함정" — 2026-11-24 사용자 결정). 기기마다 한 번, 사용자가 직접 한다:
+1. PowerShell에서 `notepad $PROFILE` — "파일이 없다"고 나오면 먼저 `New-Item -ItemType File -Force $PROFILE`.
+2. 맨 아래에 한 줄 붙이고 저장. **경로는 위 표의 그 기기 폴더**(노트북 · 회사 PC는 `C:\_dev\Itinerail`):
+   ```powershell
+   function itin { & "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\Launch-VsDevShell.ps1" -Arch amd64 -HostArch amd64 -SkipAutomaticLocation; code C:\_dev\Itinerail }
+   ```
+3. 새 PowerShell 창을 열어(프로필을 다시 읽게) VS Code 창을 **모두 닫고** `itin` → VS Code Problems에 `nmake`가 없으면 끝. 위 표를 ✅ + 날짜로 바꾼다.
+- VS 2022 Community가 다른 위치거나 버전이 다르면 `vswhere -latest -property installationPath`(`C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe`)로 찾는다.
+- 이 저장소만 쓰는 함수라 이름은 `itin`. 다른 Elixir 프로젝트가 생기면 경로를 인자로 받게 바꾼다.
 
 ## 말투
 
