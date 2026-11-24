@@ -35,34 +35,31 @@ defmodule ItinerailWeb.Layouts do
 
   def app(assigns) do
     ~H"""
+    <%!-- 위 띠: 왼쪽 앱 이름, 오른쪽 테마 토글 + 사용자 메뉴 --%>
     <header class="navbar px-4 sm:px-6 lg:px-8">
       <div class="flex-1">
-        <a href="/" class="flex-1 flex w-fit items-center gap-2">
-          <img src={~p"/images/logo.svg"} width="36" />
-          <span class="text-sm font-semibold">v{Application.spec(:phoenix, :vsn)}</span>
-        </a>
+        <%!-- "/"는 LiveView가 아니라 컨트롤러 화면이라 navigate 말고 href(페이지를 새로 받는다) --%>
+        <.link href={~p"/"} class="text-lg font-extrabold tracking-tight">Itinerail</.link>
       </div>
-      <div class="flex-none">
-        <ul class="flex px-1 space-x-4 items-center">
-          <li>
-            <a href="https://phoenixframework.org/" class="btn btn-ghost">Website</a>
-          </li>
-          <li>
-            <a href="https://github.com/phoenixframework/phoenix" class="btn btn-ghost">GitHub</a>
-          </li>
-          <li>
-            <.theme_toggle />
-          </li>
-          <li>
-            <a href="https://phoenix.hexdocs.pm/overview.html" class="btn btn-primary">
-              Get Started <span aria-hidden="true">&rarr;</span>
-            </a>
-          </li>
-        </ul>
-      </div>
+      <nav class="flex items-center gap-2 text-sm">
+        <.theme_toggle />
+        <%!-- current_scope는 "지금 누가 타고 있나" 승차권. 없으면 nil --%>
+        <%= if @current_scope do %>
+          <%!-- 좁은 화면에선 메일을 숨긴다(HTML에는 남는다) --%>
+          <span class="hidden sm:inline text-muted">{@current_scope.user.email}</span>
+          <.link href={~p"/users/settings"} class="btn btn-ghost btn-sm">설정</.link>
+          <%!-- method="delete": 링크지만 DELETE 요청으로 보낸다(로그아웃은 GET으로 하면 안 된다) --%>
+          <.link href={~p"/users/log-out"} method="delete" class="btn btn-ghost btn-sm">
+            로그아웃
+          </.link>
+        <% else %>
+          <.link href={~p"/users/register"} class="btn btn-ghost btn-sm">가입</.link>
+          <.link href={~p"/users/log-in"} class="btn btn-primary btn-sm">로그인</.link>
+        <% end %>
+      </nav>
     </header>
 
-    <main class="px-4 py-20 sm:px-6 lg:px-8">
+    <main class="px-4 py-10 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-2xl space-y-4">
         {render_slot(@inner_block)}
       </div>

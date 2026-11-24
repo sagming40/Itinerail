@@ -3,6 +3,6 @@ defmodule ItinerailWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "Peace of mind from prototype to production"
+    assert html_response(conn, 200) =~ "다음은 어디로 떠나볼까요?"
   end
 end
