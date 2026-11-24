@@ -75,6 +75,7 @@ minor-stacks에서 이어 온다. **버전 · 활동 · 지원 여부 · 외부 
 |---|---|
 | 노트북 | `C:\_dev\Itinerail` |
 | 집 PC | `D:\_dev\Itinerail` (Elixir 1.20.5 · Hex 2.7.0, 2026-11-23. phx_new 아카이브는 안 깖 — `phx.new`에만 쓴다) |
+| 회사 PC | `C:\_dev\Itinerail` (Elixir 1.20.5 · Hex 2.7.0, 2026-11-24. phx_new 아카이브는 안 깖. DB 5440, `mix test` 112 passed) |
 
 다른 기기는 GitHub에 올린 뒤 `git clone`하고 이 표에 줄을 더한다. 도구 현황은 `~/.claude/DEVTOOLS.md`.
 
