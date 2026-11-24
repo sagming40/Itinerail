@@ -55,35 +55,59 @@ defmodule ItinerailWeb.CoreComponents do
   slot :inner_block, doc: "the optional inner block that renders the flash message"
 
   def flash(assigns) do
-    assigns = assign_new(assigns, :id, fn -> "flash-#{assigns.kind}" end)
+    # flash에서 꺼낸 글을 "굵은 첫 줄"과 "나머지"로 미리 나눠 둔다
+    {head, body} = split_flash(Phoenix.Flash.get(assigns.flash, assigns.kind))
+
+    assigns =
+      assigns
+      |> assign_new(:id, fn -> "flash-#{assigns.kind}" end)
+      |> assign(head: head, body: body)
 
     ~H"""
+    <%!-- 글도 없고 안쪽 내용(slot)도 없으면 아무것도 그리지 않는다 --%>
     <div
-      :if={msg = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
+      :if={@head || @inner_block != []}
       id={@id}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
       class="toast toast-top toast-end z-50"
       {@rest}
     >
+      <%!-- 알림 카드(DESIGN 7.1): 왼쪽 6px 띠 색이 종류를 말해 준다 --%>
       <div class={[
-        "alert w-80 sm:w-96 max-w-80 sm:max-w-96 text-wrap",
-        @kind == :info && "alert-info",
-        @kind == :error && "alert-error"
+        "notice w-80 sm:w-96",
+        @kind == :info && "notice-ok",
+        @kind == :error && "notice-bad"
       ]}>
-        <.icon :if={@kind == :info} name="hero-information-circle" class="size-5 shrink-0" />
-        <.icon :if={@kind == :error} name="hero-exclamation-circle" class="size-5 shrink-0" />
-        <div>
-          <p :if={@title} class="font-semibold">{@title}</p>
-          <p>{msg}</p>
+        <span class="notice-icon">
+          <.icon :if={@kind == :info} name="hero-check-circle" class="size-5 text-success" />
+          <.icon :if={@kind == :error} name="hero-exclamation-circle" class="size-5 text-error" />
+        </span>
+        <div class="min-w-0 flex-1">
+          <p :if={@title} class="font-bold">{@title}</p>
+          <%= if @inner_block != [] do %>
+            <p>{render_slot(@inner_block)}</p>
+          <% else %>
+            <p class="font-bold">{@head}</p>
+            <p :if={@body}>{@body}</p>
+          <% end %>
         </div>
-        <div class="flex-1" />
-        <button type="button" class="group self-start cursor-pointer" aria-label={gettext("close")}>
+        <button type="button" class="group self-start cursor-pointer" aria-label="닫기">
           <.icon name="hero-x-mark" class="size-5 opacity-40 group-hover:opacity-70" />
         </button>
       </div>
     </div>
     """
+  end
+
+  # "제목\n본문" → {"제목", "본문"} ─ 줄바꿈이 없으면 한 줄 전체가 굵은 제목
+  defp split_flash(nil), do: {nil, nil}
+
+  defp split_flash(msg) do
+    case String.split(msg, "\n", parts: 2) do
+      [head, body] -> {head, body}
+      [head] -> {head, nil}
+    end
   end
 
   @doc """

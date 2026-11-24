@@ -262,3 +262,37 @@ html {
   border-bottom: 2px solid #4b5866;
   background: repeating-linear-gradient(90deg, transparent 0 22px, #4b5866 22px 26px);
 }
+
+/* 알림(DESIGN 7.1): 카드 + 왼쪽 6px 띠 + 동그란 아이콘 + 굵은 첫 줄 */
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--radius-box);
+  background: var(--color-base-100);
+  color: var(--color-base-content);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.06);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* 띠 색: 보냄 · 완료는 success, 오류는 error(= DESIGN danger) */
+.notice-ok {
+  border-left: 6px solid var(--color-success);
+}
+
+.notice-bad {
+  border-left: 6px solid var(--color-error);
+}
+
+/* 아이콘 받침: 38px 동그라미, chip 바탕 */
+.notice-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: var(--color-base-300);
+}

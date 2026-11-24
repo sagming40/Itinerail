@@ -101,7 +101,7 @@ defmodule ItinerailWeb.Layouts do
         </p>
       </aside>
 
-      <div class="flex flex-col lg:items-center lg:justify-center lg:p-10">
+      <div class="flex min-h-dvh flex-col lg:items-center lg:justify-center lg:p-10">
         <%!-- 모바일 위쪽 창문. PC에선 숨긴다 --%>
         <Scenery.train_window
           id="auth-window"
@@ -152,7 +152,7 @@ defmodule ItinerailWeb.Layouts do
       <.flash
         id="client-error"
         kind={:error}
-        title={gettext("We can't find the internet")}
+        title="⚡ 인터넷에 연결할 수 없어요 ⚡"
         phx-disconnected={
           show(".phx-client-error #client-error")
           |> JS.remove_attribute("hidden", to: ".phx-client-error #client-error")
@@ -160,14 +160,13 @@ defmodule ItinerailWeb.Layouts do
         phx-connected={hide("#client-error") |> JS.set_attribute({"hidden", ""})}
         hidden
       >
-        {gettext("Attempting to reconnect")}
-        <.icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
+        다시 연결하는 중이에요... <.icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
       </.flash>
 
       <.flash
         id="server-error"
         kind={:error}
-        title={gettext("Something went wrong!")}
+        title="⚠️ 문제가 생겼어요 ⚠️"
         phx-disconnected={
           show(".phx-server-error #server-error")
           |> JS.remove_attribute("hidden", to: ".phx-server-error #server-error")
@@ -175,8 +174,7 @@ defmodule ItinerailWeb.Layouts do
         phx-connected={hide("#server-error") |> JS.set_attribute({"hidden", ""})}
         hidden
       >
-        {gettext("Attempting to reconnect")}
-        <.icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
+        다시 연결하는 중이에요... <.icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
       </.flash>
     </div>
     """
