@@ -88,7 +88,7 @@ defmodule ItinerailWeb.Layouts do
     <%!-- PC에서만 두 칸(1.35 : 1). 모바일은 그냥 위에서 아래로 --%>
     <div class="min-h-dvh lg:grid lg:grid-cols-[1.35fr_1fr]">
       <%!-- PC 왼쪽: 기차 옆면. 모바일에선 숨긴다 --%>
-      <aside class="hidden lg:flex flex-col gap-[18px] bg-train p-7">
+      <aside class="hidden lg:flex flex-col gap-4.5 bg-train p-7">
         <Scenery.train_window id="auth-window-pc" scene={@scene} class="big flex-1">
           <.brand />
         </Scenery.train_window>
@@ -106,13 +106,13 @@ defmodule ItinerailWeb.Layouts do
         <Scenery.train_window
           id="auth-window"
           scene={@scene}
-          class="mx-3.5 mt-3.5 h-[236px] shrink-0 lg:hidden"
+          class="mx-3.5 mt-3.5 h-59 shrink-0 lg:hidden"
         >
           <.brand />
         </Scenery.train_window>
 
         <%!-- 테스트가 "main a"로 링크를 찾으니 본문은 main 안에 둔다 --%>
-        <main class="flex w-full flex-col gap-3.5 px-[22px] pt-6 pb-7 lg:w-[380px] lg:p-0">
+        <main class="flex w-full flex-col gap-3.5 px-5.5 pt-6 pb-7 lg:w-95 lg:p-0">
           {render_slot(@inner_block)}
         </main>
 
@@ -188,7 +188,7 @@ defmodule ItinerailWeb.Layouts do
   def theme_toggle(assigns) do
     ~H"""
     <div class="card relative flex flex-row items-center border-2 border-base-300 bg-base-300 rounded-full">
-      <div class="absolute w-1/3 h-full rounded-full border-1 border-base-200 bg-base-100 brightness-200 left-0 [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3 [[data-theme-source=system]_&]:!left-0 transition-[left]" />
+      <div class="absolute w-1/3 h-full rounded-full border border-base-200 bg-base-100 brightness-200 left-0 in-data-[theme=light]:left-1/3 in-data-[theme=dark]:left-2/3 in-data-[theme-source=system]:left-0! transition-[left]" />
 
       <button
         class="flex p-2 cursor-pointer w-1/3"
