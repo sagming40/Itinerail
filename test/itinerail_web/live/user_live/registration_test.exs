@@ -76,7 +76,7 @@ defmodule ItinerailWeb.UserLive.RegistrationTest do
         |> render_click()
         |> follow_redirect(conn, ~p"/users/log-in")
 
-      assert login_html =~ "Log in"
+      assert login_html =~ "어디로 떠나 볼까요?"
     end
   end
 end

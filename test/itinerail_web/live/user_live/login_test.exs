@@ -8,9 +8,9 @@ defmodule ItinerailWeb.UserLive.LoginTest do
     test "renders login page", %{conn: conn} do
       {:ok, _lv, html} = live(conn, ~p"/users/log-in")
 
-      assert html =~ "Log in"
-      assert html =~ "Sign up"
-      assert html =~ "Log in with email"
+      assert html =~ "어디로 떠나 볼까요?"
+      assert html =~ "가입하기"
+      assert html =~ "로그인 링크 받기"
     end
   end
 
@@ -25,7 +25,7 @@ defmodule ItinerailWeb.UserLive.LoginTest do
         |> render_submit()
         |> follow_redirect(conn, ~p"/users/log-in")
 
-      assert html =~ "If your email is in our system"
+      assert html =~ "메일함을 확인해 주세요"
 
       assert Itinerail.Repo.get_by!(Itinerail.Accounts.UserToken, user_id: user.id).context ==
                "login"
@@ -39,7 +39,7 @@ defmodule ItinerailWeb.UserLive.LoginTest do
         |> render_submit()
         |> follow_redirect(conn, ~p"/users/log-in")
 
-      assert html =~ "If your email is in our system"
+      assert html =~ "메일함을 확인해 주세요"
     end
   end
 
@@ -73,6 +73,27 @@ defmodule ItinerailWeb.UserLive.LoginTest do
       assert Phoenix.Flash.get(conn.assigns.flash, :error) == "Invalid email or password"
       assert redirected_to(conn) == ~p"/users/log-in"
     end
+
+    test "password section starts closed", %{conn: conn} do
+      {:ok, lv, _html} = live(conn, ~p"/users/log-in")
+
+      assert has_element?(lv, "#password-login")
+      refute has_element?(lv, "#password-login[open]")
+    end
+
+    test "password section opens after a wrong password", %{conn: conn} do
+      {:ok, lv, _html} = live(conn, ~p"/users/log-in")
+
+      form =
+        form(lv, "#login_form_password", user: %{email: "test@email.com", password: "123456"})
+
+      render_submit(form, %{user: %{remember_me: true}})
+      conn = follow_trigger_action(form, conn)
+
+      # recycle = 쿠키(세션)를 들고 다음 요청으로 — 그 안에 flash 쪽지가 같이 간다
+      {:ok, lv, _html} = live(recycle(conn), ~p"/users/log-in")
+      assert has_element?(lv, "#password-login[open]")
+    end
   end
 
   describe "login navigation" do
@@ -81,7 +102,7 @@ defmodule ItinerailWeb.UserLive.LoginTest do
 
       {:ok, _login_live, login_html} =
         lv
-        |> element("main a", "Sign up")
+        |> element("main a", "가입하기")
         |> render_click()
         |> follow_redirect(conn, ~p"/users/register")
 
@@ -98,9 +119,9 @@ defmodule ItinerailWeb.UserLive.LoginTest do
     test "shows login page with email filled in", %{conn: conn, user: user} do
       {:ok, _lv, html} = live(conn, ~p"/users/log-in")
 
-      assert html =~ "You need to reauthenticate"
-      refute html =~ "Register"
-      assert html =~ "Log in with email"
+      assert html =~ "다시 한 번 확인해주세요"
+      refute html =~ "가입하기"
+      assert html =~ "로그인 링크 받기"
 
       assert html =~
                ~s(<input type="email" name="user[email]" id="login_form_magic_email" value="#{user.email}")
