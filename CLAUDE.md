@@ -74,7 +74,7 @@ minor-stacks에서 이어 온다. **버전 · 활동 · 지원 여부 · 외부 
 
 | 기기 | 이 폴더 | `itin` 함수 |
 |---|---|---|
-| 노트북 | `C:\_dev\Itinerail` | ⬜ 아직 |
+| 노트북 | `C:\_dev\Itinerail` | ✅ 2026-11-25 |
 | 집 PC | `D:\_dev\Itinerail` (Elixir 1.20.5 · Hex 2.7.0, 2026-11-23. phx_new 아카이브는 안 깖 — `phx.new`에만 쓴다) | ✅ 2026-11-24 |
 | 회사 PC | `C:\_dev\Itinerail` (Elixir 1.20.5 · Hex 2.7.0, 2026-11-24. phx_new 아카이브는 안 깖. DB 5440, `mix test` 112 passed) | ⬜ 아직 |
 
