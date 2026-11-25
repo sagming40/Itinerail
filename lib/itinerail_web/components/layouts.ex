@@ -94,9 +94,9 @@ defmodule ItinerailWeb.Layouts do
         </Scenery.train_window>
         <div class="rail"></div>
         <p class="text-white">
-          <b class="block text-3xl leading-tight tracking-tight">다음 여행, 같이 짜요</b>
+          <b class="block text-3xl leading-tight tracking-tight">함께여도, 혼자라도</b>
           <span class="text-[15px] text-white/70">
-            창밖으로 지나가는 풍경처럼 일정도 함께 흘러가요.
+            가족 · 친구 · 연인, 누구와 떠나도 좋아요.
           </span>
         </p>
       </aside>
