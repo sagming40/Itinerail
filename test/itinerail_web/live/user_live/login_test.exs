@@ -25,7 +25,7 @@ defmodule ItinerailWeb.UserLive.LoginTest do
         |> render_submit()
         |> follow_redirect(conn, ~p"/users/log-in")
 
-      assert html =~ "메일함을 확인해 주세요"
+      assert html =~ "이메일을 확인해 주세요"
 
       assert Itinerail.Repo.get_by!(Itinerail.Accounts.UserToken, user_id: user.id).context ==
                "login"
@@ -39,7 +39,7 @@ defmodule ItinerailWeb.UserLive.LoginTest do
         |> render_submit()
         |> follow_redirect(conn, ~p"/users/log-in")
 
-      assert html =~ "메일함을 확인해 주세요"
+      assert html =~ "이메일을 확인해 주세요"
     end
   end
 
@@ -70,7 +70,7 @@ defmodule ItinerailWeb.UserLive.LoginTest do
       render_submit(form, %{user: %{remember_me: true}})
 
       conn = follow_trigger_action(form, conn)
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) == "Invalid email or password"
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) == "이메일 혹은 비밀번호가 맞지 않아요"
       assert redirected_to(conn) == ~p"/users/log-in"
     end
 

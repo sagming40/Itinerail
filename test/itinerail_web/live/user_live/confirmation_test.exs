@@ -59,7 +59,7 @@ defmodule ItinerailWeb.UserLive.ConfirmationTest do
       conn = follow_trigger_action(form, conn)
 
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~
-               "User confirmed successfully"
+               "가입 완료"
 
       assert Accounts.get_user!(user.id).confirmed_at
       # we are logged in now
@@ -93,7 +93,7 @@ defmodule ItinerailWeb.UserLive.ConfirmationTest do
       conn = follow_trigger_action(form, conn)
 
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~
-               "Welcome back!"
+               "또 오셨네요! 반가워요!"
 
       assert Accounts.get_user!(user.id).confirmed_at == user.confirmed_at
 

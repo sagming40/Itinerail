@@ -33,7 +33,7 @@ defmodule ItinerailWeb.UserLive.Login do
           readonly={!!@current_scope}
           field={f[:email]}
           type="email"
-          label="메일 주소"
+          label="이메일"
           autocomplete="username"
           spellcheck="false"
           required
@@ -74,7 +74,7 @@ defmodule ItinerailWeb.UserLive.Login do
             readonly={!!@current_scope}
             field={f[:email]}
             type="email"
-            label="메일 주소"
+            label="이메일"
             autocomplete="username"
             spellcheck="false"
             required
@@ -142,7 +142,7 @@ defmodule ItinerailWeb.UserLive.Login do
     # 첫 줄 = 굵은 제목, 둘째 줄 = 본문 (③에서 만든 split_flash가 나눠 준다)
     # 가입 여부는 드러내지 않는다 — 있든 없든 같은 문구
     info =
-      "메일함을 확인해 주세요\n가입된 메일 주소에 로그인 링크가 전송돼요. 링크는 15분 동안 한 번만 쓸 수 있어요."
+      "이메일을 확인해 주세요\n가입된 이메일로 로그인 링크가 전송돼요. 링크는 15분 동안 한 번만 사용할 수 있어요."
 
     {:noreply,
      socket

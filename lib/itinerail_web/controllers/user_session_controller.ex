@@ -5,11 +5,11 @@ defmodule ItinerailWeb.UserSessionController do
   alias ItinerailWeb.UserAuth
 
   def create(conn, %{"_action" => "confirmed"} = params) do
-    create(conn, params, "User confirmed successfully.")
+    create(conn, params, "가입 완료")
   end
 
   def create(conn, params) do
-    create(conn, params, "Welcome back!")
+    create(conn, params, "또 오셨네요! 반가워요!")
   end
 
   # magic link login
@@ -24,7 +24,7 @@ defmodule ItinerailWeb.UserSessionController do
 
       _ ->
         conn
-        |> put_flash(:error, "The link is invalid or it has expired.")
+        |> put_flash(:error, "링크가 만료됐어요\n로그인 링크는 15분 동안, 한 번만 사용할 수 있어요. 새 링크를 받아 주세요.")
         |> redirect(to: ~p"/users/log-in")
     end
   end
@@ -40,7 +40,7 @@ defmodule ItinerailWeb.UserSessionController do
     else
       # In order to prevent user enumeration attacks, don't disclose whether the email is registered.
       conn
-      |> put_flash(:error, "Invalid email or password")
+      |> put_flash(:error, "이메일 혹은 비밀번호가 맞지 않아요")
       |> put_flash(:email, String.slice(email, 0, 160))
       |> redirect(to: ~p"/users/log-in")
     end
@@ -56,12 +56,12 @@ defmodule ItinerailWeb.UserSessionController do
 
     conn
     |> put_session(:user_return_to, ~p"/users/settings")
-    |> create(params, "Password updated successfully!")
+    |> create(params, "비밀번호를 변경했어요")
   end
 
   def delete(conn, _params) do
     conn
-    |> put_flash(:info, "Logged out successfully.")
+    |> put_flash(:info, "로그아웃 완료")
     |> UserAuth.log_out_user()
   end
 end

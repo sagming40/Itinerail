@@ -21,7 +21,7 @@ defmodule ItinerailWeb.UserLive.SettingsTest do
 
       assert {:redirect, %{to: path, flash: flash}} = redirect
       assert path == ~p"/users/log-in"
-      assert %{"error" => "You must log in to access this page."} = flash
+      assert %{"error" => "로그인이 필요해요"} = flash
     end
 
     test "redirects if user is not in sudo mode", %{conn: conn} do
@@ -33,7 +33,7 @@ defmodule ItinerailWeb.UserLive.SettingsTest do
         |> live(~p"/users/settings")
         |> follow_redirect(conn, ~p"/users/log-in")
 
-      assert conn.resp_body =~ "You must re-authenticate to access this page."
+      assert conn.resp_body =~ "다시 로그인해주세요"
     end
   end
 
@@ -118,7 +118,7 @@ defmodule ItinerailWeb.UserLive.SettingsTest do
       assert get_session(new_password_conn, :user_token) != get_session(conn, :user_token)
 
       assert Phoenix.Flash.get(new_password_conn.assigns.flash, :info) =~
-               "Password updated successfully"
+               "비밀번호를 변경했어요"
 
       assert Accounts.get_user_by_email_and_password(user.email, new_password)
     end
@@ -206,7 +206,7 @@ defmodule ItinerailWeb.UserLive.SettingsTest do
       assert {:redirect, %{to: path, flash: flash}} = redirect
       assert path == ~p"/users/log-in"
       assert %{"error" => message} = flash
-      assert message == "You must log in to access this page."
+      assert message == "로그인이 필요해요"
     end
   end
 end
