@@ -18,7 +18,7 @@ defmodule ItinerailWeb.UserLive.ConfirmationTest do
         end)
 
       {:ok, _lv, html} = live(conn, ~p"/users/log-in/#{token}")
-      assert html =~ "Confirm and stay logged in"
+      assert html =~ "이 기기에서 로그인 유지"
     end
 
     test "renders login page for confirmed user", %{conn: conn, confirmed_user: user} do
@@ -28,8 +28,8 @@ defmodule ItinerailWeb.UserLive.ConfirmationTest do
         end)
 
       {:ok, _lv, html} = live(conn, ~p"/users/log-in/#{token}")
-      refute html =~ "Confirm my account"
-      assert html =~ "Keep me logged in on this device"
+      refute html =~ "비밀번호가 편하신가요?"
+      assert html =~ "이 기기에서 로그인 유지"
     end
 
     test "renders login page for already logged in user", %{conn: conn, confirmed_user: user} do
@@ -41,8 +41,8 @@ defmodule ItinerailWeb.UserLive.ConfirmationTest do
         end)
 
       {:ok, _lv, html} = live(conn, ~p"/users/log-in/#{token}")
-      refute html =~ "Confirm my account"
-      assert html =~ "Log in"
+      refute html =~ "이번만 로그인"
+      assert html =~ "로그인"
     end
 
     test "confirms the given token once", %{conn: conn, unconfirmed_user: user} do
@@ -73,7 +73,7 @@ defmodule ItinerailWeb.UserLive.ConfirmationTest do
         live(conn, ~p"/users/log-in/#{token}")
         |> follow_redirect(conn, ~p"/users/log-in")
 
-      assert html =~ "Magic link is invalid or it has expired"
+      assert html =~ "링크가 만료됐어요"
     end
 
     test "logs confirmed user in without changing confirmed_at", %{
@@ -104,7 +104,7 @@ defmodule ItinerailWeb.UserLive.ConfirmationTest do
         live(conn, ~p"/users/log-in/#{token}")
         |> follow_redirect(conn, ~p"/users/log-in")
 
-      assert html =~ "Magic link is invalid or it has expired"
+      assert html =~ "링크가 만료됐어요"
     end
 
     test "raises error for invalid token", %{conn: conn} do
@@ -112,7 +112,7 @@ defmodule ItinerailWeb.UserLive.ConfirmationTest do
         live(conn, ~p"/users/log-in/invalid-token")
         |> follow_redirect(conn, ~p"/users/log-in")
 
-      assert html =~ "Magic link is invalid or it has expired"
+      assert html =~ "링크가 만료됐어요"
     end
   end
 end

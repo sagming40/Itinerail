@@ -71,7 +71,7 @@ defmodule ItinerailWeb.UserLive.SettingsTest do
         })
 
       assert result =~ "Change Email"
-      assert result =~ "must have the @ sign and no spaces"
+      assert result =~ "이메일 형식을 확인해 주세요"
     end
 
     test "renders errors with invalid data (phx-submit)", %{conn: conn, user: user} do

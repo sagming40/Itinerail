@@ -35,15 +35,13 @@ defmodule Itinerail.Accounts.User do
     changeset =
       changeset
       |> validate_required([:email])
-      |> validate_format(:email, ~r/^[^@,;\s]+@[^@,;\s]+$/,
-        message: "must have the @ sign and no spaces"
-      )
+      |> validate_format(:email, ~r/^[^@,;\s]+@[^@,;\s]+$/, message: "이메일 형식을 확인해 주세요")
       |> validate_length(:email, max: 160)
 
     if Keyword.get(opts, :validate_unique, true) do
       changeset
-      |> unsafe_validate_unique(:email, Itinerail.Repo)
-      |> unique_constraint(:email)
+      |> unsafe_validate_unique(:email, Itinerail.Repo, message: "이미 가입된 이메일이에요")
+      |> unique_constraint(:email, message: "이미 가입된 이메일이에요")
       |> validate_email_changed()
     else
       changeset

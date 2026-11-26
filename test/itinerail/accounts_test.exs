@@ -58,7 +58,7 @@ defmodule Itinerail.AccountsTest do
     test "validates email when given" do
       {:error, changeset} = Accounts.register_user(%{email: "not valid"})
 
-      assert %{email: ["must have the @ sign and no spaces"]} = errors_on(changeset)
+      assert %{email: ["이메일 형식을 확인해 주세요"]} = errors_on(changeset)
     end
 
     test "validates maximum values for email for security" do
@@ -70,11 +70,11 @@ defmodule Itinerail.AccountsTest do
     test "validates email uniqueness" do
       %{email: email} = user_fixture()
       {:error, changeset} = Accounts.register_user(%{email: email})
-      assert "has already been taken" in errors_on(changeset).email
+      assert "이미 가입된 이메일이에요" in errors_on(changeset).email
 
       # Now try with the uppercased email too, to check that email case is ignored.
       {:error, changeset} = Accounts.register_user(%{email: String.upcase(email)})
-      assert "has already been taken" in errors_on(changeset).email
+      assert "이미 가입된 이메일이에요" in errors_on(changeset).email
     end
 
     test "registers users without password" do

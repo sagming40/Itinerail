@@ -8,8 +8,8 @@ defmodule ItinerailWeb.UserLive.RegistrationTest do
     test "renders registration page", %{conn: conn} do
       {:ok, _lv, html} = live(conn, ~p"/users/register")
 
-      assert html =~ "Register"
-      assert html =~ "Log in"
+      assert html =~ "처음이신가요?"
+      assert html =~ "로그인"
     end
 
     test "redirects if already logged in", %{conn: conn} do
@@ -30,8 +30,8 @@ defmodule ItinerailWeb.UserLive.RegistrationTest do
         |> element("#registration_form")
         |> render_change(user: %{"email" => "with spaces"})
 
-      assert result =~ "Register"
-      assert result =~ "must have the @ sign and no spaces"
+      assert result =~ "처음이신가요?"
+      assert result =~ "이메일 형식을 확인해 주세요"
     end
   end
 
@@ -46,8 +46,8 @@ defmodule ItinerailWeb.UserLive.RegistrationTest do
         render_submit(form)
         |> follow_redirect(conn, ~p"/users/log-in")
 
-      assert html =~
-               ~r/An email was sent to .*, please access it to confirm your account/
+      assert html =~ "승차권이 발급됐어요"
+      assert html =~ email
     end
 
     test "renders errors for duplicated email", %{conn: conn} do
@@ -62,7 +62,7 @@ defmodule ItinerailWeb.UserLive.RegistrationTest do
         )
         |> render_submit()
 
-      assert result =~ "has already been taken"
+      assert result =~ "이미 가입된 이메일이에요"
     end
   end
 
@@ -72,7 +72,7 @@ defmodule ItinerailWeb.UserLive.RegistrationTest do
 
       {:ok, _login_live, login_html} =
         lv
-        |> element("main a", "Log in")
+        |> element("main a", "로그인")
         |> render_click()
         |> follow_redirect(conn, ~p"/users/log-in")
 
